@@ -1,0 +1,23 @@
+#!/bin/sh
+branch="$(git symbolic-ref --short HEAD)"
+if [ "$branch" = "main" ]; then
+  echo "❌ Committing directly to 'main' is not allowed. Please use a feature branch."
+  exit 1
+fi
+
+
+# Run ESLint on backend (catches console.log via no-console rule)
+echo "🔍 Running ESLint on backend..."
+cd backend && npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ ESLint failed! Fix errors before committing."
+  exit 1
+fi
+
+echo "Running Prettier..."
+npm run format:check || {
+  echo "❌ Prettier formatting issues found. Run 'npm run format' to fix."
+  exit 1
+}
+
+echo "All pre-commit checks passed!"

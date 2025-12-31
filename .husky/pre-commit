@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Block commits on main/master branch
+branch="$(git symbolic-ref --short HEAD)"
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  echo "❌ Committing directly to '$branch' is not allowed. Please use a feature branch."
+  exit 1
+fi
+
+# Store root directory
+ROOT_DIR=$(pwd)
+
+# Function to run checks in a workspace
+run_checks() {
+  WORKSPACE=$1
+  echo ""
+  echo "Checking $WORKSPACE..."
+  
+  if [ ! -d "$ROOT_DIR/$WORKSPACE" ]; then
+    echo "⚠️ $WORKSPACE directory not found, skipping..."
+    return 0
+  fi
+  
+  cd "$ROOT_DIR/$WORKSPACE"
+  
+  # Check if package.json exists
+  if [ ! -f "package.json" ]; then
+    echo "⚠️ No package.json in $WORKSPACE, skipping..."
+    return 0
+  fi
+  
+  # Run ESLint if script exists
+  if grep -q '"lint"' package.json; then
+    echo "Running ESLint in $WORKSPACE..."
+    npm run lint
+    if [ $? -ne 0 ]; then
+      echo "❌ ESLint failed in $WORKSPACE!"
+      exit 1
+    fi
+  fi
+  
+  # Run Prettier check if script exists
+  if grep -q '"format:check"' package.json; then
+    echo "Running Prettier in $WORKSPACE..."
+    npm run format:check
+    if [ $? -ne 0 ]; then
+      echo "❌ Prettier check failed in $WORKSPACE! Run 'npm run format' to fix."
+      exit 1
+    fi
+  fi
+  
+  cd "$ROOT_DIR"
+}
+
+# Run checks in each workspace
+run_checks "backend"
+run_checks "frontend"
+
+echo ""
+echo "All pre-commit checks passed!"

@@ -24,5 +24,5 @@ app.get("/health", (req: Request, res: Response) => {
 
 // Start the actual server
 app.listen(PORT, () => {
-    console.warn(`Server running on port: ${PORT}`);
+    console.info(`Server running on port: ${PORT}`);
 });

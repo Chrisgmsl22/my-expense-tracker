@@ -1,6 +1,6 @@
 # MoneyFlow - Development Commands
 
-.PHONY: dev dev-be dev-fe build start lint lint-fix format format-check test clean install help
+.PHONY: dev dev-be dev-fe build start lint lint-fix format format-check test clean install help services-up services-down db-logs
 
 help:
 	@echo "Available commands:"
@@ -25,11 +25,25 @@ install:
 # Development - for now just backend
 dev: dev-be
 
-dev-be:
+dev-be: services-up
 	cd backend && npm run dev
 
 dev-fe:
 	@echo "Frontend not set up yet"
+
+
+# Services (only DB for now)
+services-up:
+	docker-compose up -d
+	@echo "PostgreSQL is running on port 5432"
+	
+
+services-down:
+	docker-compose down
+	@echo "PostgreSQL stopped"
+
+db-logs:
+	docker-compose logs -f postgres
 
 # Build
 build:

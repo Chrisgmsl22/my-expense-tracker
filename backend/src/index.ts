@@ -3,10 +3,10 @@ import express, { type Request, type Response } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
-import { env } from "./config/env.ts";
+import { envC } from "./config/env.ts";
 
 const app = express();
-const PORT = env.PORT;
+const PORT = envC.PORT;
 
 // Middleware section
 app.use(helmet()); // Security headers

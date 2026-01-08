@@ -211,32 +211,32 @@ Check for:
 
 ### Sub-Phase 1.2: Database Design & Prisma Setup
 
-#### 1.2.1: Install PostgreSQL & Prisma
+#### 1.2.1: Install PostgreSQL & Prisma ✅
 
--   [ ] Install Prisma CLI and Client
--   [ ] Initialize Prisma (creates schema.prisma)
--   [ ] Set up PostgreSQL (local or Docker)
--   [ ] Update DATABASE_URL in .env
--   [ ] Test database connection
+-   [x] Install Prisma CLI and Client
+-   [x] Initialize Prisma (creates schema.prisma)
+-   [x] Set up PostgreSQL (local or Docker)
+-   [x] Update DATABASE_URL in .env
+-   [x] Test database connection
 
-#### 1.2.2: Design Core Database Schema
+#### 1.2.2: Design Core Database Schema ✅
 
--   [ ] Plan entity relationships (Users, Expenses, Categories, Cards, Income, Budgets, Debts, Goals)
--   [ ] Identify required fields for each entity
--   [ ] Determine field types
--   [ ] Plan indexes for performance
+-   [x] Plan entity relationships (Users, Expenses, Categories, Cards, Income, Budgets, Debts, Goals)
+-   [x] Identify required fields for each entity
+-   [x] Determine field types
+-   [x] Plan indexes for performance
 
-#### 1.2.3: Create Prisma Models
+#### 1.2.3: Create Prisma Models ✅
 
--   [ ] Define User model
--   [ ] Define Category model (with system vs custom)
--   [ ] Define Subcategory model
--   [ ] Define Card model
--   [ ] Define Expense model (with shared expense fields)
--   [ ] Define Income model
--   [ ] Define Budget model
--   [ ] Define Debt model
--   [ ] Define Goal model
+-   [x] Define User model
+-   [x] Define Category model (with system vs custom)
+-   [x] Define Subcategory model
+-   [x] Define Card model
+-   [x] Define Expense model (with shared expense fields)
+-   [x] Define Income model
+-   [x] Define Budget model
+-   [x] Define Debt model
+-   [x] Define Goal model
 
 #### 1.2.4: Run Database Migrations
 

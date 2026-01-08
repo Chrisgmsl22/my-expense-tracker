@@ -12,3 +12,183 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  password String?
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Profile and preferences
+  profilePictureUrl String?
+  defaultCurrency String @default("MXN")
+  language String @default("en")
+
+  // FFs
+  aiEnabled Boolean @default(false)
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?
+
+  // Relationships
+  expenses Expense[]
+  categories Category[]
+  cards Card[]
+  income Income[]
+  budgets Budget[]
+  debts Debt[]
+  goals Goal[]
+}
+
+model Category {
+  id String @id @default(uuid())
+  userId String? // Scalar field ==> FK
+  user User? @relation(fields: [userId], references: [id]) // Relation field (DOES NOT EXIST IN DB)
+  
+  name String
+  isRelevant Boolean @default(true)
+  isSystemCategory Boolean @default(false) // Sys categories cannot be deleted
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  subcategories Subcategory[]
+  expenses Expense[]
+  budgets Budget[]
+
+  @@unique([userId, name]) // User can't have duplicate category name
+}
+
+model Subcategory {
+  id String @id @default(uuid())
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  expenses Expense[]
+}
+
+model Card {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  name String
+  color String
+  type String
+  creditLimit Float?
+  dueDate Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses Expense[]
+  
+}
+
+// Keep an eye, this is the most complex
+model Expense {
+  // PK and FKs
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+
+  subcategoryId String?
+  subcategory Subcategory? @relation(fields: [subcategoryId], references: [id])
+
+  cardId String? // Optional because it could be cash
+  card Card? @relation(fields: [cardId], references: [id])
+  
+  date DateTime
+  description String
+  amount Float
+  currency String @default("MXN")
+
+  // Shared expense fields
+  isShared Boolean @default(false)
+  sharedWith String? // Friend, Mother, GF
+  yourPercentage Float @default(1.0) // 100%, 0.70 == 70%
+  actualExpenditure Float
+  settlementStatus String @default("n/a")
+  paidAt DateTime?
+
+  // Recurring expenses
+  isRecurring Boolean @default(false)
+  recurringFrequency String? // Weekly | Monthly | Yearly
+  recurringDay Int?
+
+  //Optional metadata
+  merchantName String?
+  notes String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date]) // Performance: common query pattern
+}
+
+model Income {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  date DateTime
+  amount Float
+  source String // Salary, Freelance, etc
+  type String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Budget {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+
+  monthYear String // "2024-12" format
+  budgetAmount Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, categoryId, monthYear]) // One budget per category per month
+}
+
+model Debt {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  name String
+  totalAmount Float
+  remainingAmount Float
+  interestRate Float
+  minimumPayment Float
+  dueDate Int
+  type String // loan, credit card, etc
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Goal {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  name String // Vacation, phone
+  targetAmount Float
+  currentAmount Float @default(0)
+  deadline DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -24,7 +24,7 @@ const getEnvVarAsNumber = (key: string, defaultValue: number): number => {
     return parsed;
 };
 
-export const env = {
+export const envC = {
     // Server
     PORT: getEnvVarAsNumber("PORT", 3000),
     NODE_ENV: getEnvVar("NODE_ENV", false),

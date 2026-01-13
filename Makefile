@@ -75,3 +75,7 @@ test:
 clean:
 	rm -rf backend/dist
 	rm -rf frontend/dist
+
+## DB
+launch-db-client:
+	cd backend && npx prisma studio --browser none

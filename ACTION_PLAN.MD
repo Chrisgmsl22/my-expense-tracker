@@ -238,13 +238,13 @@ Check for:
 -   [x] Define Debt model
 -   [x] Define Goal model
 
-#### 1.2.4: Run Database Migrations
+#### 1.2.4: Run Database Migrations ✅
 
--   [ ] Generate Prisma Client
--   [ ] Create initial migration
--   [ ] Verify tables created (Prisma Studio)
--   [ ] Create database config singleton
--   [ ] Export Prisma instance
+-   [x] Generate Prisma Client
+-   [x] Create initial migration
+-   [x] Verify tables created (Prisma Studio)
+-   [x] Create database config singleton
+-   [x] Export Prisma instance
 
 #### 1.2.5: Seed System Categories
 

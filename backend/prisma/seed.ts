@@ -154,6 +154,7 @@ const systemCategories: SeedSystemCategories[] = [
 ];
 
 const main = async () => {
+    /* eslint-disable no-console */
     console.log("Seeding system categories ...");
 
     for (const category of systemCategories) {
@@ -172,6 +173,7 @@ const main = async () => {
                 },
             },
         });
+        /* eslint-disable no-console */
         console.log(`Created: ${category.name}`);
     }
 };

@@ -34,6 +34,41 @@ A modern web application combining manual expense tracking with AI-powered autom
 
 ---
 
+## 🎓 Learning Methodology
+
+This project follows a **creation-first learning approach**. The goal is to build real engineering skills through struggle, not copy-paste from AI.
+
+### Rules of Engagement with AI
+
+**AI WILL:**
+- ✅ Explain concepts and ideas briefly
+- ✅ Give suggestions and hints (not solutions)
+- ✅ Review code YOU wrote first
+- ✅ Help understand error messages
+- ✅ Discuss architectural trade-offs
+- ✅ Run terminal commands (with approval)
+
+**AI WILL NOT:**
+- ❌ Show complete code implementations
+- ❌ Solve problems before you attempt
+- ❌ Write code for you (unless explicitly requested)
+
+### The Process
+
+1. **Attempt first** - Spend 15+ minutes trying yourself
+2. **Let it break** - Read errors, debug yourself
+3. **Ask for hints** - Not solutions
+4. **Review after** - AI reviews YOUR working code
+
+### The Test
+
+Before asking AI for help, ask yourself:
+- Have I tried implementing this myself?
+- Can I explain WHY this code works?
+- Am I building muscle memory or just copying?
+
+---
+
 ## 🛠️ Tech Stack
 
 ### **Backend**

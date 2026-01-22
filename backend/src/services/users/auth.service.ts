@@ -15,6 +15,7 @@ import {
     ConflictError,
     ValidationError,
 } from "../../utils/errors.ts";
+import { normalize } from "../../utils/normalize.ts";
 export class AuthService {
     private static async hashPassword(password: string): Promise<string> {
         const saltRounds = 12;
@@ -71,9 +72,9 @@ export class AuthService {
     }
     public static async createUser(userData: ISignupRequest): Promise<IUser> {
         const { email, name, password: rawPassword } = userData;
-        const normalizedEmail = email.toLowerCase().trim();
+        const normalizedEmail = normalize(email);
 
-        if (!AuthService.validateEmail(email)) {
+        if (!AuthService.validateEmail(normalizedEmail)) {
             throw new ValidationError("Invalid email format");
         }
 
@@ -144,7 +145,7 @@ export class AuthService {
 
     public static async login(email: string, password: string): Promise<IUser> {
         // get the user from DB
-        const user = await AuthService.findUserByEmail(email.toLowerCase());
+        const user = await AuthService.findUserByEmail(normalize(email));
         if (!user) {
             throw new AuthenticationError("Invalid email or password");
         }

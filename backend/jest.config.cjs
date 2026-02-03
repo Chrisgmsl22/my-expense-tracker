@@ -1,5 +1,5 @@
 /** @type {import('jest').Config} */
-const config = {
+module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
     roots: ["<rootDir>/src"],
@@ -11,15 +11,19 @@ const config = {
         "^.+\\.ts$": [
             "ts-jest",
             {
-                useESM: true,
+                useESM: false,
+                tsconfig: {
+                    module: "CommonJS",
+                    moduleResolution: "node",
+                    esModuleInterop: true,
+                },
             },
         ],
     },
-    extensionsToTreatAsEsm: [".ts"],
+    // extensionsToTreatAsEsm: [".ts"],
     moduleFileExtensions: ["ts", "js", "json"],
     clearMocks: true,
     testTimeout: 10000,
     coverageDirectory: "coverage",
+    setupFilesAfterEnv: ["./jest.setup.js"], // Todo, make sure this is right
 };
-
-export default config;

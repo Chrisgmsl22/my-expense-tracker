@@ -17,26 +17,26 @@ import {
 } from "../../utils/errors.ts";
 import { normalize } from "../../utils/normalize.ts";
 export class AuthService {
-    private static async hashPassword(password: string): Promise<string> {
+    public static async hashPassword(password: string): Promise<string> {
         const saltRounds = 12;
 
         const hashedPassword = await hash(password, saltRounds);
         return hashedPassword;
     }
 
-    private static async validatePassword(
+    public static async validatePassword(
         givenPassword: string,
         currHash: string
     ): Promise<boolean> {
         return await compare(givenPassword, currHash);
     }
 
-    private static validateEmail(email: string): boolean {
+    public static validateEmail(email: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email.trim());
     }
 
-    private static validatePasswordStrength(password: string): boolean {
+    public static validatePasswordStrength(password: string): boolean {
         const minLength = 8;
         const hasUpperCase = /[A-Z]/.test(password);
         const hasLowerCase = /[a-z]/.test(password);

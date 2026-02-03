@@ -6,7 +6,7 @@ import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 
 export default defineConfig([
     {
-        ignores: ["dist/**", "src/generated/**"],
+        ignores: ["dist/**", "src/generated/**", "jest.setup.js"],
     },
     {
         files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
@@ -14,7 +14,7 @@ export default defineConfig([
         extends: ["js/recommended"],
         languageOptions: { globals: globals.node },
         rules: {
-            "no-console": "warn",
+            "no-console": ["warn", { allow: ["warn", "error"] }],
             "@typescript-eslint/no-unused-vars": [
                 "error",
                 {

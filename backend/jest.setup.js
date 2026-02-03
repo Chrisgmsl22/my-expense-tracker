@@ -5,5 +5,3 @@ const path = require("path");
 
 // Load the specific .env.test file
 dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
-
-console.log("Test environment file loaded: ", process.env.JWT_SECRET);

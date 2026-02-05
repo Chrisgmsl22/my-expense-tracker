@@ -14,8 +14,9 @@ import {
     AuthenticationError,
     ConflictError,
     ValidationError,
-} from "../../utils/errors.ts";
-import { normalize } from "../../utils/normalize.ts";
+} from "../../utils/errors.utils.ts";
+import { normalize } from "../../utils/normalize.utils.ts";
+import { stripUserPassword } from "../../utils/user.utils.ts";
 export class AuthService {
     public static async hashPassword(password: string): Promise<string> {
         const saltRounds = 12;
@@ -50,14 +51,19 @@ export class AuthService {
         );
     }
 
+    public static async findUserById(id: string): Promise<User | null> {
+        // Returns a full user, it will then be our responsibility to strip the password before returning it to the controller
+        return await prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+    }
+
     public static async checkUserConflicts(
         email: string
     ): Promise<IUserExistsCheck> {
-        const user = await prisma.user.findUnique({
-            where: {
-                email,
-            },
-        });
+        const user = await AuthService.findUserByEmail(email);
 
         if (user) {
             return {
@@ -99,14 +105,14 @@ export class AuthService {
             data: user,
         });
 
-        const { password: _, ...cleanUser } = createdUser;
+        const cleanUser = stripUserPassword(createdUser);
 
         return cleanUser;
     }
 
     public static generateToken(payload: IJwtPayload): string {
         const options: SignOptions = {
-            expiresIn: "1h",
+            expiresIn: "8h",
             issuer: "expense-tracker-app",
         };
         // If env var is not configured, it will error out automatically
@@ -161,7 +167,6 @@ export class AuthService {
             throw new AuthenticationError("Invalid email or password");
         }
 
-        const { password: _, ...cleanUser } = user;
-        return cleanUser;
+        return stripUserPassword(user);
     }
 }

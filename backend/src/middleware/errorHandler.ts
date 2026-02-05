@@ -9,7 +9,7 @@
  */
 
 import type { NextFunction, Request, Response } from "express";
-import { AppError } from "../utils/errors.ts";
+import { AppError } from "../utils/errors.utils.ts";
 import type { IAuthResponse } from "../types/auth.ts";
 
 //? In order to have an actual next() middleware error handler, we need to define this function with EXACTLY 4 params

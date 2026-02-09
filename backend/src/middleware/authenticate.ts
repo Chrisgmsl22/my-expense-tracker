@@ -1,5 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
-import { AuthenticationError } from "../utils/errors.utils.ts";
+import {
+    AuthenticationError,
+    UserNotFoundError,
+} from "../utils/errors.utils.ts";
 import { AuthService } from "../services/users/auth.service.ts";
 import { stripUserPassword } from "../utils/user.utils.ts";
 import type { IUser } from "../types/auth.ts";
@@ -35,7 +38,7 @@ export const authenticate = async (
         if (user) {
             req.user = stripUserPassword(user);
         } else {
-            throw new AuthenticationError("User not found");
+            throw new UserNotFoundError("User not found");
         }
     } else {
         throw new AuthenticationError(verifyResult.error);

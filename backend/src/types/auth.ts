@@ -1,4 +1,5 @@
 import { type User } from "../generated/prisma/index.js";
+import type { IApiResponse } from "./common.ts";
 
 export type IUser = Omit<User, "password">;
 
@@ -23,3 +24,14 @@ export type ITokenVerificationResult =
           payload: IJwtPayload;
       }
     | { valid: false; error: string };
+
+export interface IUserPublic {
+    id: string;
+    name: string;
+    email: string;
+    createdAt: Date;
+}
+
+export interface IAuthResponse extends IApiResponse<IUserPublic> {
+    token?: string;
+}

@@ -17,7 +17,7 @@ import {
     AuthenticationError,
     ConflictError,
     ValidationError,
-} from "../../utils/errors.ts";
+} from "../../utils/errors.utils.ts";
 import { AuthService } from "./auth.service.ts";
 describe("AuthService", () => {
     beforeEach(() => {

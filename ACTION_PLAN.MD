@@ -187,7 +187,7 @@ Check for:
 
 **Goal**: Project infrastructure, database, authentication  
 **Duration**: 3-4 weeks  
-**Status**: 🔲 Not Started
+**Status**: 🟡 In Progress
 
 ### **What You'll Learn**
 
@@ -281,93 +281,96 @@ Check for:
 -   [x] Create database config singleton
 -   [x] Export Prisma instance
 
-#### 1.2.5: Seed System Categories
+#### 1.2.5: Seed System Categories ✅
 
--   [ ] Create prisma/seed.ts
--   [ ] Define system categories array (Housing, Groceries, Transport, etc.)
--   [ ] Write seed script
--   [ ] Add seed script to package.json
--   [ ] Run seed
--   [ ] Verify in Prisma Studio
+-   [x] Create prisma/seed.ts
+-   [x] Define system categories array (Housing, Groceries, Transport, etc.)
+-   [x] Write seed script
+-   [x] Add seed script to package.json
+-   [x] Run seed
+-   [x] Verify in Prisma Studio
 
-**Checkpoint**: Database connected, all tables created, Prisma Client generates, system categories seeded
+**Checkpoint**: Database connected, all tables created, Prisma Client generates, system categories seeded ✅
 
 ---
 
-### Sub-Phase 1.3: Authentication System
+### Sub-Phase 1.3: Authentication System ✅
 
-#### 1.3.1: Install Authentication Dependencies
+#### 1.3.1: Install Authentication Dependencies ✅
 
--   [ ] Install jsonwebtoken and types
--   [ ] Install bcrypt and types
--   [ ] Install Zod for validation
--   [ ] Verify JWT_SECRET in .env
+-   [x] Install jsonwebtoken and types
+-   [x] Install bcrypt and types
+-   [ ] Install Zod for validation (moved to 1.4)
+-   [x] Verify JWT_SECRET in .env
 
-#### 1.3.2: Create User Service
+#### 1.3.2: Create User Service ✅
 
--   [ ] Create services/user.service.ts
--   [ ] Implement createUser method (validate, hash password, create in DB)
--   [ ] Implement findUserByEmail method
--   [ ] Implement validatePassword method
--   [ ] Create TypeScript interfaces
+-   [x] Create services/auth.service.ts (combined with auth service)
+-   [x] Implement createUser method (validate, hash password, create in DB)
+-   [x] Implement findUserByEmail method
+-   [x] Implement findUserById method
+-   [x] Implement validatePassword method
+-   [x] Create TypeScript interfaces
 
-#### 1.3.3: Create Auth Service
+#### 1.3.3: Create Auth Service ✅
 
--   [ ] Create services/auth.service.ts
--   [ ] Implement generateToken method
--   [ ] Implement verifyToken method
--   [ ] Implement register method (call userService)
--   [ ] Implement login method
+-   [x] Create services/auth.service.ts
+-   [x] Implement generateToken method
+-   [x] Implement verifyToken method
+-   [x] Implement login method
+-   [x] Implement password hashing and validation
+-   [x] Add unit tests (20 tests)
 
-#### 1.3.4: Create Auth Controller
+#### 1.3.4: Create Auth Controller ✅
 
--   [ ] Create controllers/auth.controller.ts
--   [ ] Implement register handler (extract data, validate, call service, return response)
--   [ ] Implement login handler
--   [ ] Handle errors appropriately
+-   [x] Create controllers/user.controller.ts
+-   [x] Implement register handler (extract data, validate, call service, return response)
+-   [x] Implement login handler
+-   [x] Handle errors appropriately
+-   [x] Add unit tests (9 tests)
 
-#### 1.3.5: Create Auth Routes
+#### 1.3.5: Create Auth Routes ✅
 
--   [ ] Create routes/auth.routes.ts
--   [ ] Define POST /api/auth/register
--   [ ] Define POST /api/auth/login
--   [ ] Mount routes in main server file
+-   [x] Create routes/user.routes.ts
+-   [x] Define POST /api/auth/register
+-   [x] Define POST /api/auth/login
+-   [x] Mount routes in main server file
 
-#### 1.3.6: Create Auth Middleware
+#### 1.3.6: Create Auth Middleware ✅
 
--   [ ] Create middleware/auth.middleware.ts
--   [ ] Implement authenticate middleware (extract token, verify, find user, attach to req.user)
--   [ ] Export middleware
+-   [x] Create middleware/authenticate.ts
+-   [x] Implement authenticate middleware (extract token, verify, find user, attach to req.user)
+-   [x] Export middleware
+-   [x] Add unit tests (7 tests)
 
-#### 1.3.7: Create Protected Route Example
+#### 1.3.7: Create Protected Route Example (Skipped)
 
--   [ ] Create routes/user.routes.ts
--   [ ] Define GET /api/users/me (with auth middleware)
--   [ ] Create controllers/user.controller.ts
--   [ ] Implement getMe handler
+-   [x] Skipped - auth middleware is tested and ready; will be applied to expense routes in Phase 2
 
-#### 1.3.8: Test Authentication Flow
+#### 1.3.8: Test Authentication Flow ✅
 
--   [ ] Test registration endpoint
--   [ ] Test duplicate registration (should fail)
--   [ ] Test login with correct credentials
--   [ ] Test login with wrong password
--   [ ] Test protected route with valid token
--   [ ] Test protected route without token
--   [ ] Test protected route with invalid token
+-   [x] Test registration endpoint (Postman + unit tests)
+-   [x] Test duplicate registration (should fail)
+-   [x] Test login with correct credentials
+-   [x] Test login with wrong password
+-   [x] Test protected route with valid token
+-   [x] Test protected route without token
+-   [x] Test protected route with invalid token
+-   [x] Error handler middleware with tests
 
-**Checkpoint**: Users can register, passwords hashed, login returns JWT, protected routes work, invalid tokens rejected
+**Checkpoint**: Users can register, passwords hashed, login returns JWT, protected routes work, invalid tokens rejected ✅
 
 ---
 
 ### Sub-Phase 1.4: Error Handling & Logging
 
-#### 1.4.1: Create Error Handler Middleware
+#### 1.4.1: Create Error Handler Middleware ✅
 
--   [ ] Create middleware/errorHandler.middleware.ts
--   [ ] Define custom error classes (AppError, ValidationError, UnauthorizedError, NotFoundError, ConflictError)
--   [ ] Implement error handler middleware (log error, return appropriate status and JSON)
--   [ ] Add as last middleware in server
+-   [x] Create middleware/errorHandler.ts
+-   [x] Define custom error classes (AppError, ValidationError, AuthenticationError, NotFoundError, ConflictError, AccountDeactivationError)
+-   [x] Implement error handler middleware (log error, return appropriate status and JSON)
+-   [x] Add as last middleware in server
+-   [x] Add unit tests
 
 #### 1.4.2: Set Up Logging
 
@@ -379,6 +382,7 @@ Check for:
 
 #### 1.4.3: Add Request Validation
 
+-   [ ] Install Zod
 -   [ ] Create middleware/validate.middleware.ts
 -   [ ] Implement generic validation middleware using Zod
 -   [ ] Create validation schemas for auth routes
@@ -455,7 +459,7 @@ Check for:
 -   [ ] Code comments for complex logic
 -   [ ] API endpoints documented
 
-**Phase 1 Status**: 🔲 Not Started → 🟡 In Progress → 🟢 Completed
+**Phase 1 Status**: 🟡 In Progress (1.4.2 and 1.4.3 remaining, then 1.5 Docker)
 
 ---
 

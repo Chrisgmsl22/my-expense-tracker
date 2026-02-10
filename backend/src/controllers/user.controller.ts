@@ -67,18 +67,16 @@ export class UserController {
         next: NextFunction
     ): Promise<void> {
         try {
-            const { name, email, password } = req.body;
-            const isAtLeastOnePropMissing = !name || !email || !password;
+            const { email, password } = req.body;
+            const isAtLeastOnePropMissing = !email || !password;
             const propTypesNotValid =
-                typeof name != "string" ||
-                typeof email != "string" ||
-                typeof password != "string";
+                typeof email != "string" || typeof password != "string";
             // Validate
             if (isAtLeastOnePropMissing || propTypesNotValid) {
                 res.status(400).json({
                     success: false,
                     message:
-                        "name, email and password are required, and must be strings",
+                        "email and password are required, and must be strings",
                 } as IApiResponse);
                 return;
             }

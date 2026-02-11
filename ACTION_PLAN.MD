@@ -372,13 +372,15 @@ Check for:
 -   [x] Add as last middleware in server
 -   [x] Add unit tests
 
-#### 1.4.2: Set Up Logging
+#### 1.4.2: Set Up Logging ✅
 
--   [ ] Install winston
--   [ ] Create utils/logger.ts
--   [ ] Configure winston (console + file transports, log levels)
--   [ ] Replace console.log with logger
--   [ ] Add request logging middleware
+-   [x] Install winston
+-   [x] Create utils/logger.ts
+-   [x] Configure winston (console + file transports, log levels)
+-   [x] Configure dev format (colorized, readable) vs prod format (JSON)
+-   [x] Replace console.log/error with logger
+-   [x] Create middleware/requestLogger.ts for HTTP request logging
+-   [x] Mount requestLogger before routes in index.ts
 
 #### 1.4.3: Add Request Validation
 
@@ -459,7 +461,7 @@ Check for:
 -   [ ] Code comments for complex logic
 -   [ ] API endpoints documented
 
-**Phase 1 Status**: 🟡 In Progress (1.4.2 and 1.4.3 remaining, then 1.5 Docker)
+**Phase 1 Status**: 🟡 In Progress (1.4.3 Zod validation remaining, then 1.5 Docker)
 
 ---
 

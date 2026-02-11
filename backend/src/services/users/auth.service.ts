@@ -17,6 +17,7 @@ import {
 } from "../../utils/errors.utils.ts";
 import { normalize } from "../../utils/normalize.utils.ts";
 import { stripUserPassword } from "../../utils/user.utils.ts";
+import logger from "../../utils/logger.ts";
 export class AuthService {
     public static async hashPassword(password: string): Promise<string> {
         const saltRounds = 12;
@@ -132,7 +133,7 @@ export class AuthService {
             } else if (error instanceof jwt.JsonWebTokenError) {
                 return { valid: false, error: "Invalid token" };
             } else {
-                console.error(error);
+                logger.error(error);
                 return {
                     valid: false,
                     error: `Token verification failed: ${error}`,

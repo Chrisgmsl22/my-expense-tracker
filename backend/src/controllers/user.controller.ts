@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from "express";
-import type { IApiResponse } from "../types/common.ts";
 import { AuthService } from "../services/users/auth.service.ts";
 import type { IAuthResponse } from "../types/auth.ts";
 
@@ -18,20 +17,6 @@ export class UserController {
         try {
             // Extract data
             const { name, email, password } = req.body;
-            const isAtLeastOnePropMissing = !name || !email || !password;
-            const propTypesNotValid =
-                typeof name != "string" ||
-                typeof email != "string" ||
-                typeof password != "string";
-            // Validate
-            if (isAtLeastOnePropMissing || propTypesNotValid) {
-                res.status(400).json({
-                    success: false,
-                    message:
-                        "name, email and password are required, and must be strings",
-                } as IApiResponse);
-                return;
-            }
 
             // Call service
             const userCreated = await AuthService.createUser({
@@ -68,18 +53,6 @@ export class UserController {
     ): Promise<void> {
         try {
             const { email, password } = req.body;
-            const isAtLeastOnePropMissing = !email || !password;
-            const propTypesNotValid =
-                typeof email != "string" || typeof password != "string";
-            // Validate
-            if (isAtLeastOnePropMissing || propTypesNotValid) {
-                res.status(400).json({
-                    success: false,
-                    message:
-                        "email and password are required, and must be strings",
-                } as IApiResponse);
-                return;
-            }
 
             const validatedUser = await AuthService.login(email, password);
             const userJwt = AuthService.generateToken({

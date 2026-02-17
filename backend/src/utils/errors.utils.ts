@@ -1,3 +1,5 @@
+import type { IFieldError } from "../types/errors.ts";
+
 /**
  * Base class for all custom errors with HTTP status codes
  */
@@ -12,8 +14,11 @@ export abstract class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-    constructor(message: string) {
+    public errors: IFieldError[] | undefined; // Not all validation errors should have this
+
+    constructor(message: string, errors?: IFieldError[]) {
         super(message, 400);
+        this.errors = errors;
     }
 }
 

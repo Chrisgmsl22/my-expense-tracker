@@ -9,9 +9,9 @@
  */
 
 import type { NextFunction, Request, Response } from "express";
-import { AppError } from "../utils/errors.utils.ts";
-import type { IAuthResponse } from "../types/auth.ts";
+import { AppError, ValidationError } from "../utils/errors.utils.ts";
 import logger from "../utils/logger.ts";
+import type { IApiResponse } from "../types/common.ts";
 
 //? In order to have an actual next() middleware error handler, we need to define this function with EXACTLY 4 params
 // error, request, response and next()
@@ -23,10 +23,18 @@ export const errorHandler = (
 ) => {
     // Handle custom application errors
     if (err instanceof AppError) {
-        res.status(err.statusCode).json({
-            success: false,
-            message: err.message,
-        } as IAuthResponse);
+        if (err instanceof ValidationError) {
+            res.status(err.statusCode).json({
+                success: false,
+                message: err.message,
+                errors: err.errors,
+            } as IApiResponse);
+        } else {
+            res.status(err.statusCode).json({
+                success: false,
+                message: err.message,
+            } as IApiResponse);
+        }
     } else {
         if (process.env.NODE_ENV !== "production") {
             // Only for debugging purposes
@@ -40,6 +48,6 @@ export const errorHandler = (
         res.status(500).json({
             success: false,
             message: "Internal server error",
-        } as IAuthResponse);
+        } as IApiResponse);
     }
 };

@@ -7,6 +7,7 @@ import {
     ValidationError,
 } from "../utils/errors.utils.ts";
 import { errorHandler } from "./errorHandler.ts";
+import type { IFieldError } from "../types/errors.ts";
 
 describe("errorHandler middleware", () => {
     let mockRequest: Partial<Request>;
@@ -44,6 +45,28 @@ describe("errorHandler middleware", () => {
             expect(jsonMock).toHaveBeenCalledWith({
                 success: false,
                 message: "Invalid email format",
+            });
+        });
+
+        it("Should handle ValidationError when FieldError array is passed on", () => {
+            const errors: IFieldError[] = [
+                { field: "name", message: "Message is required" },
+                { field: "email", message: "Invalid email format" },
+            ];
+            const err = new ValidationError("Validation failed", errors);
+
+            errorHandler(
+                err,
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(statusMock).toHaveBeenCalledWith(400);
+            expect(jsonMock).toHaveBeenCalledWith({
+                success: false,
+                message: "Validation failed",
+                errors,
             });
         });
 

@@ -382,16 +382,21 @@ Check for:
 -   [x] Create middleware/requestLogger.ts for HTTP request logging
 -   [x] Mount requestLogger before routes in index.ts
 
-#### 1.4.3: Add Request Validation
+#### 1.4.3: Add Request Validation ✅
 
--   [ ] Install Zod
--   [ ] Create middleware/validate.middleware.ts
--   [ ] Implement generic validation middleware using Zod
--   [ ] Create validation schemas for auth routes
--   [ ] Apply validation to routes
--   [ ] Test with invalid data
+-   [x] Install Zod
+-   [x] Create middleware/validateRequest.ts (higher-order function pattern)
+-   [x] Implement generic validation middleware using Zod
+-   [x] Create validation schemas for auth routes (registerUserSchema, loginUserSchema)
+-   [x] Apply validation to routes
+-   [x] Test with invalid data (manual + unit tests)
+-   [x] Add IFieldError type and update ValidationError class
+-   [x] Update errorHandler to handle ValidationError with field errors
+-   [x] Update IApiResponse to include errors field
+-   [x] Unit tests for validateRequest middleware (4 tests)
+-   [x] Unit test for errorHandler ValidationError with field errors branch
 
-**Checkpoint**: Errors handled consistently, logging working, validation prevents bad data
+**Checkpoint**: Errors handled consistently, logging working, validation prevents bad data ✅
 
 ---
 
@@ -461,7 +466,7 @@ Check for:
 -   [ ] Code comments for complex logic
 -   [ ] API endpoints documented
 
-**Phase 1 Status**: 🟡 In Progress (1.4.3 Zod validation remaining, then 1.5 Docker)
+**Phase 1 Status**: 🟡 In Progress (1.4.3 Zod validation ✅, next: 1.5 Docker)
 
 ---
 

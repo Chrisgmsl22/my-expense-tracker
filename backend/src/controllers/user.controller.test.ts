@@ -80,50 +80,6 @@ describe("UserController", () => {
             });
         });
 
-        it("Should return 400 when email is missing from request", async () => {
-            mockReq.body = {
-                name: "John",
-                // email: is missing from req body
-                password: "WeWork441$$$",
-            };
-
-            await UserController.register(
-                mockReq as Request,
-                mockRes as Response,
-                mockNext
-            );
-
-            expect(statusMock).toHaveBeenCalledWith(400);
-            expect(jsonMock).toHaveBeenCalledWith({
-                success: false,
-                message:
-                    "name, email and password are required, and must be strings",
-            });
-            expect(mockCreateUser).not.toHaveBeenCalled();
-        });
-
-        it("Should return 400 when email is not a valid type", async () => {
-            mockReq.body = {
-                name: "John",
-                email: 333,
-                password: "WeWork441$$$",
-            };
-
-            await UserController.register(
-                mockReq as Request,
-                mockRes as Response,
-                mockNext
-            );
-
-            expect(statusMock).toHaveBeenCalledWith(400);
-            expect(jsonMock).toHaveBeenCalledWith({
-                success: false,
-                message:
-                    "name, email and password are required, and must be strings",
-            });
-            expect(mockCreateUser).not.toHaveBeenCalled();
-        });
-
         it("Should call next() when service throws any Error on register", async () => {
             const serviceLayerErr = new ValidationError("Invalid email format");
             mockCreateUser.mockRejectedValue(serviceLayerErr);
@@ -187,64 +143,6 @@ describe("UserController", () => {
                 },
                 token: "jwt-token-here",
             });
-        });
-
-        it("Should return 400 when email is missing from request", async () => {
-            mockReq.body = {
-                password: "WeWork441$$$",
-            };
-
-            await UserController.login(
-                mockReq as Request,
-                mockRes as Response,
-                mockNext
-            );
-
-            expect(statusMock).toHaveBeenCalledWith(400);
-            expect(jsonMock).toHaveBeenCalledWith({
-                success: false,
-                message: "email and password are required, and must be strings",
-            });
-            expect(mockLogin).not.toHaveBeenCalled();
-        });
-
-        it("Should return 400 when password is missing from request", async () => {
-            mockReq.body = {
-                email: "john@mail.com",
-            };
-
-            await UserController.login(
-                mockReq as Request,
-                mockRes as Response,
-                mockNext
-            );
-
-            expect(statusMock).toHaveBeenCalledWith(400);
-            expect(jsonMock).toHaveBeenCalledWith({
-                success: false,
-                message: "email and password are required, and must be strings",
-            });
-            expect(mockLogin).not.toHaveBeenCalled();
-        });
-
-        it("Should return 400 when email is not a valid type", async () => {
-            mockReq.body = {
-                email: 12345,
-                password: "WeWork441$$$",
-            };
-
-            await UserController.login(
-                mockReq as Request,
-                mockRes as Response,
-                mockNext
-            );
-
-            expect(statusMock).toHaveBeenCalledWith(400);
-            expect(jsonMock).toHaveBeenCalledWith({
-                success: false,
-                message: "email and password are required, and must be strings",
-            });
-            expect(mockLogin).not.toHaveBeenCalled();
         });
 
         it("Should call next() when service throws an error", async () => {

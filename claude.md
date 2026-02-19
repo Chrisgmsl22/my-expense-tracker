@@ -41,9 +41,12 @@ These documents define the project scope and goals. Always be aware of where we 
 - ✅ Error handler middleware with custom error classes
 - ✅ Winston logger setup with request logging
 - ✅ Controller layer fully tested
+- ✅ Zod validation middleware with unit tests (4 tests)
+- ✅ Auth validation schemas (register, login)
+- ✅ Error handler updated for field-level validation errors
 
-**Current Task**: Sub-Phase 1.4.3 - Add Zod validation middleware
-**Next**: Sub-Phase 1.5 - Docker development setup
+**Current Task**: Sub-Phase 1.5 - Docker development setup
+**Next**: Phase 2 - Core Expense Tracking
 
 ## Tech Stack
 
@@ -53,7 +56,7 @@ These documents define the project scope and goals. Always be aware of where we 
 - JWT + bcrypt (authentication)
 - Winston (logging)
 - Jest + Supertest (testing)
-- Zod (validation - to be added)
+- Zod (validation)
 
 ### Future Stack
 - Redis (caching)
@@ -74,14 +77,16 @@ The user is learning backend development by building, not by watching. The goal 
 #### ✅ AI SHOULD:
 1. **Always re-read modified files before reviewing** - When the user asks for a review or feedback, re-read all recently modified files (and related files) to see their latest state. Never rely on previously cached file contents, as the user may have already made changes since the last read.
 2. **Explain concepts briefly** - Provide high-level understanding without code
-2. **Give hints and guidance** - Point in right direction, don't solve
-3. **Review code the user wrote** - Critique and suggest improvements AFTER implementation
-4. **Help understand errors** - Explain error messages and debugging approaches
-5. **Discuss trade-offs** - Explain pros/cons of different approaches
-6. **Run terminal commands** - Execute bash commands, git operations, tests (with approval)
-7. **Flag security issues immediately** - Critical bugs and vulnerabilities should be fixed right away
-8. **Generate tests** - Write unit tests after user implements features (with approval)
-9. **Write boilerplate** - After user understands the pattern (with approval)
+3. **Give hints and guidance** - Point in right direction, don't solve
+4. **Review code the user wrote** - Critique and suggest improvements AFTER implementation
+5. **Help understand errors** - Explain error messages and debugging approaches
+6. **Discuss trade-offs** - Explain pros/cons of different approaches
+7. **Run terminal commands** - Execute bash commands, git operations, tests (with approval)
+8. **Flag security issues immediately** - Critical bugs and vulnerabilities should be fixed right away
+9. **Generate tests** - Write unit tests after user implements features (with approval)
+10. **Write boilerplate** - After user understands the pattern (with approval)
+11. **Run tests and linter after changes** - After writing or modifying unit tests, or making changes to source code, always run the relevant test suite (`npm test` or targeted test file) and the linter (`npm run lint`) to verify everything passes before moving on
+12. **Update ACTION_PLAN.MD after completing a section** - When a sub-phase or section is finished, update ACTION_PLAN.MD to mark tasks as complete (`[x]`), add the ✅ marker to the section header, and update the phase status line to reflect current progress
 
 #### ❌ AI SHOULD NOT:
 1. **Write implementation code** - Unless explicitly requested or exception applies
@@ -413,4 +418,4 @@ Remember: I'm here to guide your learning, not replace it. You learn by doing, n
 
 **Last Updated**: February 11, 2026
 **Current Phase**: Phase 1 (Foundation & Setup)
-**Status**: 🟡 In Progress - Sub-Phase 1.4.3 (Zod Validation)
+**Status**: 🟡 In Progress - Sub-Phase 1.5 (Docker Development Setup)

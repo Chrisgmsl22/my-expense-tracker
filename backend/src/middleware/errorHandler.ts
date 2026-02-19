@@ -23,7 +23,7 @@ export const errorHandler = (
 ) => {
     // Handle custom application errors
     if (err instanceof AppError) {
-        if (err instanceof ValidationError) {
+        if (err instanceof ValidationError && err.errors) {
             res.status(err.statusCode).json({
                 success: false,
                 message: err.message,

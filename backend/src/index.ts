@@ -1,13 +1,12 @@
-import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import { envC } from "./config/env.ts";
 import userRoutes from "./routes/user.routes.ts";
 import { errorHandler } from "./middleware/errorHandler.ts";
 import { requestLogger } from "./middleware/requestLogger.ts";
 import logger from "./utils/logger.ts";
 import healthRoutes from "./routes/health.routes.ts";
+import { envC } from "./config/env.ts";
 
 const app = express();
 const PORT = envC.PORT;

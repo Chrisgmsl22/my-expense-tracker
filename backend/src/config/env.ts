@@ -1,3 +1,9 @@
+import dotenv from "dotenv";
+
+// Loading up env secrets from root and backend
+dotenv.config({ path: "../.env" });
+dotenv.config({ path: "./.env" });
+
 // Env variable validations
 // This will error out on startup and display the env variables needed
 
@@ -30,7 +36,14 @@ export const envC = {
     NODE_ENV: getEnvVar("NODE_ENV", false),
 
     // DB
-    DATABASE_URL: getEnvVar("DATABASE_URL"),
+    DATABASE_URL: ((): string => {
+        const user = getEnvVar("POSTGRES_USER");
+        const password = getEnvVar("POSTGRES_PASSWORD");
+        const dbName = getEnvVar("POSTGRES_DB");
+        const port = getEnvVarAsNumber("DB_PORT", 5432);
+
+        return `postgresql://${user}:${password}@localhost:${port}/${dbName}`;
+    })(),
 
     // Auth
     JWT_SECRET: getEnvVar("JWT_SECRET"),

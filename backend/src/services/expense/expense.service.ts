@@ -227,10 +227,19 @@ export class ExpenseService {
             updateData.yourPercentage ?? existingExpense.yourPercentage;
         const actualExpenditure = amount * yourPercentage;
 
-        // Recompute settlementStatus if shared status changed
-        const isSharedExpense =
-            updateData.isSharedExpense ?? existingExpense.isShared;
-        const settlementStatus = isSharedExpense ? "pending" : "n/a";
+        // Only recompute settlement fields when sharing status is explicitly changed
+        const sharingChanged = updateData.isSharedExpense !== undefined;
+        const settlementFields: Record<string, unknown> = {};
+
+        if (sharingChanged) {
+            settlementFields.isShared = updateData.isSharedExpense;
+            if (updateData.isSharedExpense) {
+                settlementFields.settlementStatus = "pending";
+            } else {
+                settlementFields.settlementStatus = "n/a";
+                settlementFields.paidAt = null;
+            }
+        }
 
         return await prisma.expense.update({
             where: { id: expenseId },
@@ -269,8 +278,7 @@ export class ExpenseService {
                 amount,
                 yourPercentage,
                 actualExpenditure,
-                isShared: isSharedExpense,
-                settlementStatus,
+                ...settlementFields,
             },
             include: {
                 category: true,

@@ -36,36 +36,29 @@ A modern web application combining manual expense tracking with AI-powered autom
 
 ## 🎓 Learning Methodology
 
-This project follows a **creation-first learning approach**. The goal is to build real engineering skills through struggle, not copy-paste from AI.
+This project follows a **design-first, understanding-always** approach. The goal is to build real engineering judgment — knowing how to design systems, review code critically, and make architectural decisions. AI handles implementation of known patterns; the user writes code when encountering new concepts.
 
-### Rules of Engagement with AI
+### Two Modes of Working
 
-**AI WILL:**
-- ✅ Explain concepts and ideas briefly
-- ✅ Give suggestions and hints (not solutions)
-- ✅ Review code YOU wrote first
-- ✅ Help understand error messages
-- ✅ Discuss architectural trade-offs
-- ✅ Run terminal commands (with approval)
+**Mode 1 (Default): AI Implements Known Patterns**
+- User designs the approach and makes decisions
+- AI implements following established codebase patterns
+- User reviews code critically and asks questions
+- Used for: repetitive CRUD, following existing patterns, tests, boilerplate
 
-**AI WILL NOT:**
-- ❌ Show complete code implementations
-- ❌ Solve problems before you attempt
-- ❌ Write code for you (unless explicitly requested)
+**Mode 2: User Implements New Concepts**
+- AI flags when a new pattern/concept appears
+- User writes the code to build understanding
+- AI reviews and provides feedback after
+- Once understood, future instances switch to Mode 1
 
-### The Process
+### The Check
 
-1. **Attempt first** - Spend 15+ minutes trying yourself
-2. **Let it break** - Read errors, debug yourself
-3. **Ask for hints** - Not solutions
-4. **Review after** - AI reviews YOUR working code
-
-### The Test
-
-Before asking AI for help, ask yourself:
-- Have I tried implementing this myself?
-- Can I explain WHY this code works?
-- Am I building muscle memory or just copying?
+Before accepting AI-generated code, ask yourself:
+- Can I explain what this code does and why?
+- What would break if I changed a key part?
+- Could I explain this to a colleague?
+- If this fails in production, where would I look?
 
 ---
 
@@ -105,36 +98,30 @@ Before asking AI for help, ask yourself:
 
 ### **Core Principles**
 
-1. **You write the code** - AI guides, you implement
-2. **Understand before implementing**
-3. **Test as you build**
-4. **Iterate and improve**
-5. **Learn from mistakes**
+1. **Design first** — Understand the approach before code gets written
+2. **Understand always** — Never accept code you can't explain
+3. **New concepts = hands-on** — Write it yourself the first time
+4. **Known patterns = AI implements** — Don't re-type what you already understand
+5. **Review critically** — Read AI code like you'd review a teammate's PR
 
-### **AI Assistant Rules** ⚠️ CRITICAL
+### **AI Working Rules** ⚠️ CRITICAL
 
-#### **What AI Should DO:**
+#### **AI SHOULD:**
 
--   ✅ Explain concepts and guidance
--   ✅ Show code examples in sidebar (NOT in files)
--   ✅ Help debug with questions
--   ✅ Review code on commit
+-   ✅ Flag new concepts and ask if user wants to write it
+-   ✅ Implement known patterns following codebase conventions
+-   ✅ Explain what was written and key decisions
+-   ✅ Discuss design/trade-offs before implementing
 -   ✅ Flag security vulnerabilities immediately
--   ✅ Suggest improvements with reasoning
+-   ✅ Run tests and linter after changes
+-   ✅ Update ACTION_PLAN.MD after completing sections
 
-#### **What AI Should NOT DO:**
+#### **AI SHOULD NOT:**
 
--   ❌ Write code in your files (unless explicitly allowed)
--   ❌ Make decisions for you
--   ❌ Solve problems without your involvement
--   ❌ Implement features end-to-end
-
-#### **Exceptions - AI CAN Code When:**
-
-1. Generating unit tests (after approval)
-2. Debugging critical bugs (after you've tried)
-3. Writing boilerplate (after you understand)
-4. You explicitly request it
+-   ❌ Skip design discussion before significant code
+-   ❌ Implement new concepts without flagging them
+-   ❌ Make architectural decisions silently
+-   ❌ Generate code the user can't explain
 
 #### **Code Review Standards:**
 
@@ -185,9 +172,9 @@ Check for:
 
 ## Phase 1: Foundation & Setup
 
-**Goal**: Project infrastructure, database, authentication  
-**Duration**: 3-4 weeks  
-**Status**: 🟡 In Progress
+**Goal**: Project infrastructure, database, authentication
+**Duration**: 3-4 weeks
+**Status**: 🟢 Completed
 
 ### **What You'll Learn**
 
@@ -400,31 +387,37 @@ Check for:
 
 ---
 
-### Sub-Phase 1.5: Docker Development Setup
+### Sub-Phase 1.5: Docker Development Setup ✅
 
-#### 1.5.1: Create Docker Compose File
+#### 1.5.1: Create Docker Compose File ✅
 
--   [ ] Create docker-compose.yml (PostgreSQL + Redis services)
--   [ ] Create .env.docker
--   [ ] Update DATABASE_URL for Docker
+-   [x] Create docker-compose.yml (PostgreSQL + Redis services)
+-   [x] Use environment variable interpolation (`${...}`) from root `.env`
+-   [x] Configure volumes for data persistence
+-   [x] Redis healthcheck configured
 
-#### 1.5.2: Create Makefile for Docker Commands
+#### 1.5.2: Environment Variable Refactor ✅
 
--   [ ] Create Makefile (up, down, restart, logs, db-push, db-migrate, db-studio commands)
--   [ ] Test commands
--   [ ] Document in README.md
+-   [x] Split env files: root `.env` (DB credentials), `backend/.env` (app-specific)
+-   [x] Refactored `env.ts` to load both `.env` files via dotenv
+-   [x] `DATABASE_URL` composed from individual variables in `envC`
+-   [x] Removed hardcoded connection strings
+-   [x] Updated `.env.example` files for both root and backend
 
-#### 1.5.3: Test Full Setup
+#### 1.5.3: Create Makefile for Docker Commands ✅
 
--   [ ] Start containers
--   [ ] Run Prisma migrations
--   [ ] Seed database
--   [ ] Start dev server
--   [ ] Test all auth endpoints
--   [ ] Stop containers
--   [ ] Verify data persistence
+-   [x] Create Makefile (dev, services-up, services-down, db-logs, lint, test, build, clean, etc.)
+-   [x] `make dev` starts Docker services then backend server
+-   [x] Prisma Studio command included
 
-**Checkpoint**: Docker containers work, database accessible, app runs with Docker DB, data persists
+#### 1.5.4: Test Full Setup ✅
+
+-   [x] Start containers via `make dev`
+-   [x] Server starts and connects to Docker PostgreSQL
+-   [x] All 40 tests passing
+-   [x] Linter clean
+
+**Checkpoint**: Docker containers work, database accessible, app runs with Docker DB, data persists ✅
 
 ---
 
@@ -466,15 +459,15 @@ Check for:
 -   [ ] Code comments for complex logic
 -   [ ] API endpoints documented
 
-**Phase 1 Status**: 🟡 In Progress (1.4.3 Zod validation ✅, next: 1.5 Docker)
+**Phase 1 Status**: 🟢 Completed
 
 ---
 
 ## Phase 2: Core Expense Tracking
 
-**Goal**: Full expense CRUD, categories, cards, shared expenses  
-**Duration**: 4-5 weeks  
-**Status**: 🔒 Locked
+**Goal**: Full expense CRUD, categories, cards, shared expenses
+**Duration**: 4-5 weeks
+**Status**: 🟡 In Progress
 
 ### **What You'll Learn**
 

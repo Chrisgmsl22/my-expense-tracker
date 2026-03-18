@@ -45,3 +45,9 @@ export class UserNotFoundError extends AppError {
         super(message, 404);
     }
 }
+
+export class NotFoundError extends AppError {
+    constructor(message: string) {
+        super(message, 404);
+    }
+}

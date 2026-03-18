@@ -254,7 +254,7 @@ export class ExpenseService {
                     cardId: updateData.cardId ?? null,
                 }),
                 ...(updateData.date && { date: updateData.date }),
-                ...(updateData.description && {
+                ...(updateData.description !== undefined && {
                     description: updateData.description,
                 }),
                 ...(updateData.sharedWith !== undefined && {

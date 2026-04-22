@@ -40,17 +40,21 @@ This project follows a **design-first, understanding-always** approach. The goal
 
 ### Two Modes of Working
 
-**Mode 1 (Default): AI Implements Known Patterns**
-- User designs the approach and makes decisions
-- AI implements following established codebase patterns
-- User reviews code critically and asks questions
-- Used for: repetitive CRUD, following existing patterns, tests, boilerplate
+**Mode 1 (Default): User Implements**
+- User writes the code, even for known patterns — repetition builds muscle memory
+- AI mentors: answers questions, gives hints when stuck, explains concepts
+- AI reviews after: critiques code, suggests improvements, catches issues
+- Used for: all features, services, controllers, routes, business logic, tests
 
-**Mode 2: User Implements New Concepts**
+**Mode 2: AI Implements (Boilerplate Only)**
+- AI writes code only for genuinely repetitive, zero-learning-value tasks
+- Config files, mechanical refactors, import wiring, repetitive scaffolding
+- The test: if writing it teaches something, user writes it (Mode 1)
+
+**Mode 3: Deep Learning (New Concepts)**
 - AI flags when a new pattern/concept appears
-- User writes the code to build understanding
+- AI explains the concept first, then user writes the code
 - AI reviews and provides feedback after
-- Once understood, future instances switch to Mode 1
 
 ### The Check
 
@@ -483,15 +487,16 @@ Check for:
 
 ### Sub-Phase 2.1: Expense CRUD Operations
 
-#### 2.1.1: Create Expense Service
+#### 2.1.1: Create Expense Service ✅
 
--   [ ] Create services/expense.service.ts
--   [ ] Implement createExpense (validate, calculate actualExpenditure, create in DB)
--   [ ] Implement getExpenses (with filters: dateFrom, dateTo, categoryId, cardId)
--   [ ] Implement getExpenseById (verify ownership)
--   [ ] Implement updateExpense (recalculate actualExpenditure if needed)
--   [ ] Implement deleteExpense (verify ownership)
--   [ ] Add TypeScript interfaces
+-   [x] Create services/expense.service.ts
+-   [x] Implement createExpense (validate, calculate actualExpenditure, create in DB)
+-   [x] Implement getExpenses (with filters: dateFrom, dateTo, categoryId, cardId)
+-   [x] Implement getExpenseById (verify ownership)
+-   [x] Implement updateExpense (recalculate actualExpenditure if needed)
+-   [x] Implement deleteExpense (verify ownership)
+-   [x] Add TypeScript interfaces
+-   [x] Unit tests (29 tests covering all service methods)
 
 #### 2.1.2: Create Expense Controller
 
@@ -2736,10 +2741,10 @@ Remember: **This is YOUR learning journey. Take your time, understand deeply, an
 
 ---
 
-**Plan Version**: 1.0  
-**Last Updated**: December 2024  
+**Plan Version**: 1.1  
+**Last Updated**: April 2026  
 **Estimated Total Time**: 8-9 months (5-7 hours/week)  
-**Maintainer**: You + AI Assistant
+**Maintainer**: You + AI Assistant (mentor/reviewer role)
 
 ---
 

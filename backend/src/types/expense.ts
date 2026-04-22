@@ -1,3 +1,6 @@
+import type { Expense } from "../generated/prisma/index.js";
+import type { IApiResponse } from "./common.ts";
+
 export interface ICreateExpenseRequest {
     categoryId: string;
     subcategoryId?: string;
@@ -21,3 +24,6 @@ export interface ICreateExpenseRequest {
     merchantName?: string;
     notes?: string;
 }
+
+export type ExpenseResponse = IApiResponse<Expense>;
+export type ExpensesResponse = IApiResponse<Expense[]>;

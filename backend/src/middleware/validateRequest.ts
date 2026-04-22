@@ -40,6 +40,7 @@ export const validateRequest = (
                 case ValidateReq.Query: {
                     const parsedQueryData = zodSchema.parse(req.query);
                     req.query = parsedQueryData as qs.ParsedQs;
+                    break;
                 }
             }
 

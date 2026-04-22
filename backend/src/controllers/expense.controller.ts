@@ -36,7 +36,11 @@ export class ExpenseController {
             const { id } = req.params;
             const userId = req.user!.id;
 
-            const expense = await ExpenseService.getExpenseById(id!, userId); // Can we assume there will always be an ID?, maybe thanks to the zod schemas
+            const expense = await ExpenseService.updateExpense(
+                id!,
+                userId,
+                req.body
+            );
 
             res.status(200).json({
                 success: true,

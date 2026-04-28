@@ -7,15 +7,6 @@ import { AuthService } from "../services/users/auth.service.ts";
 import { stripUserPassword } from "../utils/user.utils.ts";
 import type { IUser } from "../types/auth.ts";
 
-declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace Express {
-        interface Request {
-            user?: IUser;
-        }
-    }
-}
-
 export const authenticate = async (
     req: Request,
     res: Response,

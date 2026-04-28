@@ -12,7 +12,7 @@ import {
 const expenseRoutes = Router();
 
 expenseRoutes.post(
-    "/expense/create",
+    "/expenses",
     authenticate,
     validateRequest(createExpenseSchema, ValidateReq.Body),
     ExpenseController.createExpense
@@ -25,12 +25,26 @@ expenseRoutes.get(
     ExpenseController.getExpenses
 );
 
+expenseRoutes.get(
+    "/expenses/:id",
+    authenticate,
+    validateRequest(expenseIdParamSchema, ValidateReq.Params),
+    ExpenseController.getExpenseById
+);
+
 expenseRoutes.patch(
-    "/expense/:id",
+    "/expenses/:id",
     authenticate,
     validateRequest(expenseIdParamSchema, ValidateReq.Params),
     validateRequest(updateExpenseSchema, ValidateReq.Body),
     ExpenseController.updateExpense
+);
+
+expenseRoutes.delete(
+    "/expenses/:id",
+    authenticate,
+    validateRequest(expenseIdParamSchema, ValidateReq.Params),
+    ExpenseController.deleteExpense
 );
 
 export default expenseRoutes;

@@ -1,6 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { ExpenseService } from "../services/expense/expense.service.ts";
-import type { ExpenseResponse, ExpensesResponse } from "../types/expense.ts";
+import type {
+    ExpenseResponse,
+    ExpensesResponse,
+    GetExpensesQuery,
+} from "../types/expense.ts";
 
 export class ExpenseController {
     public static async createExpense(
@@ -9,18 +13,17 @@ export class ExpenseController {
         next: NextFunction
     ): Promise<void> {
         try {
-            // There is already our auth middleware function which checks if user is authenticated
             const user = req.user;
 
             const userCreated = await ExpenseService.createExpense(
-                user!.id,
+                user!.id, //todo: Fix in the future
                 req.body // Zod schema will make sure we are passing it exactly what this endpoint needs
             );
 
             res.status(201).json({
                 success: true,
                 message: "Expense created successfully",
-                data: { ...userCreated },
+                data: userCreated,
             } as ExpenseResponse);
         } catch (error) {
             next(error);
@@ -53,15 +56,13 @@ export class ExpenseController {
     }
 
     public static async getExpenses(
-        // Important: Should be all expenses PER USER
-        // Do we need this one?
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
             const userId = req.user!.id;
-            const queryParams = req.query;
+            const queryParams = req.validatedQuery as GetExpensesQuery; // validated query should be used;
 
             const allExpenses = await ExpenseService.getExpenses(
                 userId,
@@ -79,14 +80,45 @@ export class ExpenseController {
     }
 
     public static async getExpenseById(
-        _req: Request,
-        _res: Response,
-        _next: NextFunction
-    ): Promise<void> {}
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const userId = req.user!.id;
+            const { id } = req.params;
+            const expense = await ExpenseService.getExpenseById(id!, userId);
+
+            res.status(200).json({
+                success: true,
+                message: "Expense retrieved successfully",
+                data: expense,
+            } as ExpenseResponse);
+        } catch (error) {
+            next(error);
+        }
+    }
 
     public static async deleteExpense(
-        _req: Request,
-        _res: Response,
-        _next: NextFunction
-    ): Promise<void> {}
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const userId = req.user!.id;
+            const { id } = req.params;
+            const deletedExpense = await ExpenseService.deleteExpense(
+                id!,
+                userId
+            );
+
+            res.status(204).json({
+                success: true,
+                message: "Expense deleted successfully",
+                data: deletedExpense,
+            } as ExpenseResponse);
+        } catch (error) {
+            next(error);
+        }
+    }
 }

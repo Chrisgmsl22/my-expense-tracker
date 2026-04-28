@@ -27,6 +27,9 @@ export const validateRequest = (
             switch (whatToValidate) {
                 // adding {} gives each case its own scope block. This is helpful because we define variabkes
                 case ValidateReq.Body: {
+                    if (req.body == undefined) {
+                        throw new ValidationError("Request body is needed");
+                    }
                     const parsedBodyData = zodSchema.parse(req.body);
                     // If no issues are found, then we could parse back to the req obj
                     req.body = parsedBodyData;
@@ -34,12 +37,14 @@ export const validateRequest = (
                 }
                 case ValidateReq.Params: {
                     const parsedParamsData = zodSchema.parse(req.params);
-                    req.params = parsedParamsData as ParamsDictionary;
+                    req.validatedParams = parsedParamsData as ParamsDictionary;
                     break;
                 }
                 case ValidateReq.Query: {
+                    // Express 5 does not allow req.query overrides, so we need to append a new field and have
+                    // the controller read from it
                     const parsedQueryData = zodSchema.parse(req.query);
-                    req.query = parsedQueryData as qs.ParsedQs;
+                    req.validatedQuery = parsedQueryData as qs.ParsedQs;
                     break;
                 }
             }

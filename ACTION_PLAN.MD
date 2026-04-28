@@ -483,11 +483,23 @@ Check for:
 -   Calculated fields
 -   Service layer patterns
 
+### **PR Strategy (Updated April 2026)**
+
+**Goal**: Ship one PR every 1-2 days. Sub-phases are split into **vertical slices**, each independently shippable. Prefer small, focused PRs over large bundled ones.
+
+A vertical slice = a self-contained piece of work that can be reviewed, tested, and merged on its own. For example, "Service + types + unit tests" is one slice; "Controller + routes + validation + integration tests" is another.
+
+**Rules of thumb:**
+-   Each slice should be reviewable in under 30 minutes
+-   Each slice ends with passing tests and a green CI
+-   Don't bundle unrelated work into a single PR
+-   It's better to have 3 small PRs than 1 big one
+
 ---
 
 ### Sub-Phase 2.1: Expense CRUD Operations
 
-#### 2.1.1: Create Expense Service ✅
+#### 2.1.1: Create Expense Service ✅ (PR #11 — merged)
 
 -   [x] Create services/expense.service.ts
 -   [x] Implement createExpense (validate, calculate actualExpenditure, create in DB)
@@ -498,44 +510,52 @@ Check for:
 -   [x] Add TypeScript interfaces
 -   [x] Unit tests (29 tests covering all service methods)
 
-#### 2.1.2: Create Expense Controller
+#### 2.1.2: Create Expense Controller ✅
 
--   [ ] Create controllers/expense.controller.ts
--   [ ] Implement createExpense handler
--   [ ] Implement getAllExpenses handler
--   [ ] Implement getExpenseById handler
--   [ ] Implement updateExpense handler
--   [ ] Implement deleteExpense handler
+-   [x] Create controllers/expense.controller.ts
+-   [x] Implement createExpense handler
+-   [x] Implement getAllExpenses handler
+-   [x] Implement getExpenseById handler
+-   [x] Implement updateExpense handler
+-   [x] Implement deleteExpense handler
 
-#### 2.1.3: Create Expense Routes
+#### 2.1.3: Create Expense Routes ✅
 
--   [ ] Create routes/expense.routes.ts
--   [ ] Define POST /api/expenses
--   [ ] Define GET /api/expenses
--   [ ] Define GET /api/expenses/:id
--   [ ] Define PUT /api/expenses/:id
--   [ ] Define DELETE /api/expenses/:id
--   [ ] Apply auth middleware
--   [ ] Mount routes
+-   [x] Create routes/expense.routes.ts
+-   [x] Define POST /api/expenses
+-   [x] Define GET /api/expenses
+-   [x] Define GET /api/expenses/:id
+-   [x] Define PATCH /api/expenses/:id
+-   [x] Define DELETE /api/expenses/:id
+-   [x] Apply auth middleware
+-   [x] Mount routes
 
-#### 2.1.4: Create Validation Schemas
+#### 2.1.4: Create Validation Schemas ✅
 
--   [ ] Create schemas/expense.schema.ts
--   [ ] Define createExpenseSchema (Zod)
--   [ ] Define updateExpenseSchema
--   [ ] Define queryFiltersSchema
+-   [x] Create schemas/expense.schema.ts
+-   [x] Define createExpenseSchema (Zod)
+-   [x] Define updateExpenseSchema
+-   [x] Define getExpensesQuerySchema (filters)
+-   [x] Define expenseIdParamSchema (route params)
+-   [x] Extend validateRequest middleware to handle Body / Params / Query
 
-#### 2.1.5: Test Expense CRUD
+#### 2.1.5: Manual Testing (Postman) ✅
 
--   [ ] Create expense via POST
--   [ ] Verify actualExpenditure calculated
--   [ ] Get all expenses
--   [ ] Get single expense
--   [ ] Update expense
--   [ ] Delete expense
--   [ ] Test with invalid category
--   [ ] Test with another user's expense
--   [ ] Test shared expense with percentage
+-   [x] Create expense via POST
+-   [x] Verify actualExpenditure calculated
+-   [x] Get all expenses
+-   [x] Get single expense
+-   [x] Update expense
+-   [x] Delete expense
+-   [x] Test with invalid category UUID
+-   [x] Test ownership (another user's expense)
+
+#### 2.1.6: Controller Unit Tests (this PR)
+
+-   [ ] Add expense.controller.test.ts
+-   [ ] Test all 5 handler methods (mock service layer)
+-   [ ] Test success responses (status code, response shape)
+-   [ ] Test error propagation to next(error)
 
 **Checkpoint**: Can CRUD expenses, actualExpenditure calculated, filtering works, only user's expenses accessible
 
@@ -543,28 +563,41 @@ Check for:
 
 ### Sub-Phase 2.2: Category Management
 
-#### 2.2.1: Create Category Service
+Split into PR-sized vertical slices. Each `[PR]` marker indicates a separate, mergeable PR.
+
+#### 2.2.1: Category Service [PR]
 
 -   [ ] Create services/category.service.ts
 -   [ ] Implement getCategories (system + user's custom)
 -   [ ] Implement createCategory (custom)
 -   [ ] Implement updateCategory
 -   [ ] Implement deleteCategory (check if in use)
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests covering all service methods
+
+#### 2.2.2: Subcategory Service [PR]
+
 -   [ ] Implement subcategory CRUD methods
+-   [ ] Add ownership and parent-category checks
+-   [ ] Unit tests for subcategory methods
 
-#### 2.2.2: Create Category Controller & Routes
+#### 2.2.3: Category Controller + Routes + Validation [PR]
 
--   [ ] Create controllers/category.controller.ts
--   [ ] Implement all handlers
--   [ ] Create routes/category.routes.ts
--   [ ] Define GET /api/categories
--   [ ] Define POST /api/categories
--   [ ] Define PUT /api/categories/:id
--   [ ] Define DELETE /api/categories/:id
--   [ ] Define subcategory routes
+-   [ ] Create controllers/category.controller.ts (all handlers)
+-   [ ] Create schemas/category.schema.ts (Zod schemas)
+-   [ ] Create routes/category.routes.ts (GET/POST/PATCH/DELETE)
+-   [ ] Apply auth middleware
 -   [ ] Mount routes
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
-#### 2.2.3: Test Category Management
+#### 2.2.4: Subcategory Controller + Routes + Validation [PR]
+
+-   [ ] Add subcategory handlers + schemas + routes
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
+
+#### 2.2.5: Manual E2E Testing
 
 -   [ ] Get all categories
 -   [ ] Create custom category
@@ -580,30 +613,36 @@ Check for:
 
 ### Sub-Phase 2.3: Card Management
 
-#### 2.3.1: Create Card Service
+Split into vertical slices. Each `[PR]` marker = a mergeable PR.
+
+#### 2.3.1: Card Service (basic CRUD) [PR]
 
 -   [ ] Create services/card.service.ts
 -   [ ] Implement createCard
--   [ ] Implement getCards (with current spending calculation)
+-   [ ] Implement getCards
 -   [ ] Implement updateCard
 -   [ ] Implement deleteCard (check if in use)
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests
 
-#### 2.3.2: Add Utilization Calculation
+#### 2.3.2: Utilization Calculation [PR]
 
 -   [ ] Calculate current month spending per card (Prisma aggregate)
 -   [ ] Calculate utilization percentage for credit cards
 -   [ ] Add color-coded status (green/yellow/red)
 -   [ ] Return with card data
+-   [ ] Unit tests for calculations
 
-#### 2.3.3: Create Card Controller & Routes
+#### 2.3.3: Card Controller + Routes + Validation [PR]
 
 -   [ ] Create controllers/card.controller.ts
--   [ ] Implement CRUD handlers
--   [ ] Create routes/card.routes.ts
--   [ ] Define routes (GET, POST, PUT, DELETE /api/cards)
--   [ ] Mount routes
+-   [ ] Create schemas/card.schema.ts
+-   [ ] Create routes/card.routes.ts (GET/POST/PATCH/DELETE)
+-   [ ] Apply auth middleware
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
-#### 2.3.4: Test Card Management
+#### 2.3.4: Manual E2E Testing
 
 -   [ ] Create card with all properties
 -   [ ] Add expenses to card
@@ -618,7 +657,9 @@ Check for:
 
 ### Sub-Phase 2.4: Dashboard Aggregations
 
-#### 2.4.1: Create Dashboard Service
+Split into vertical slices. Each `[PR]` marker = a mergeable PR.
+
+#### 2.4.1: Dashboard Service [PR]
 
 -   [ ] Create services/dashboard.service.ts
 -   [ ] Implement getDashboardData (month, year):
@@ -629,16 +670,20 @@ Check for:
     -   Committed money
     -   Available money
 -   [ ] Optimize with parallel Prisma queries
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests for aggregations
 
-#### 2.4.2: Create Dashboard Controller & Route
+#### 2.4.2: Dashboard Controller + Route + Validation [PR]
 
 -   [ ] Create controllers/dashboard.controller.ts
--   [ ] Implement getDashboard handler
+-   [ ] Create schemas/dashboard.schema.ts (month/year query params)
 -   [ ] Create routes/dashboard.routes.ts
 -   [ ] Define GET /api/dashboard
--   [ ] Mount routes
+-   [ ] Apply auth middleware
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
-#### 2.4.3: Test Dashboard Endpoint
+#### 2.4.3: Manual E2E Testing
 
 -   [ ] Add sample data (expenses, income, cards)
 -   [ ] Call GET /api/dashboard
@@ -652,18 +697,31 @@ Check for:
 
 ### Sub-Phase 2.5: Shared Expenses & Settlement
 
-#### 2.5.1: Add Settlement Tracking
+Split into vertical slices. Each `[PR]` marker = a mergeable PR.
+
+#### 2.5.1: Settlement Tracking (service layer) [PR]
 
 -   [ ] In expenseService, set settlementStatus for shared expenses
 -   [ ] Implement markExpenseAsPaid method
 -   [ ] Implement getSettlementSummary (group by person, calculate totals owed)
+-   [ ] Unit tests for settlement methods
 
-#### 2.5.2: Add Settlement Endpoints
+#### 2.5.2: Settlement Endpoints [PR]
 
 -   [ ] Add markAsPaid handler to expense controller
+-   [ ] Add settlement schemas
 -   [ ] Create GET /api/expenses/settlements
 -   [ ] Add PATCH /api/expenses/:id/settle
--   [ ] Test flow (create shared, view settlements, mark paid)
+-   [ ] Apply auth middleware
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
+
+#### 2.5.3: Manual E2E Testing
+
+-   [ ] Create shared expense
+-   [ ] View settlements summary
+-   [ ] Mark expense as paid
+-   [ ] Verify settlementStatus transitions
 
 **Checkpoint**: Shared expenses tracked, settlement status works, can mark as paid
 
@@ -673,7 +731,7 @@ Check for:
 
 ### Functionality ✅
 
--   [ ] Expense CRUD operational
+-   [x] Expense CRUD operational
 -   [ ] Categories manageable
 -   [ ] Cards tracked
 -   [ ] Shared expenses working

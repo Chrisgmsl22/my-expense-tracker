@@ -4,6 +4,13 @@ import logger from "../utils/logger.ts";
 import { ZodError } from "zod";
 import { ValidationError } from "../utils/errors.utils.ts";
 import type { IFieldError } from "../types/errors.ts";
+import type { ParamsDictionary } from "express-serve-static-core";
+
+export enum ValidateReq {
+    Body,
+    Params,
+    Query,
+}
 
 /**
  * ExpressJS does not allow middleware functions with more than 3 params (req, res, next), so we
@@ -11,12 +18,36 @@ import type { IFieldError } from "../types/errors.ts";
  *
  */
 //TODO: Keep in mind we will extend this to also validate request params
-export const validateRequest = (zodSchema: z.ZodType) => {
+export const validateRequest = (
+    zodSchema: z.ZodType,
+    whatToValidate: ValidateReq
+) => {
     return (req: Request, _res: Response, next: NextFunction) => {
         try {
-            const parsedData = zodSchema.parse(req.body);
-            // If no issues are found, then we could parse back to the req obj
-            req.body = parsedData;
+            switch (whatToValidate) {
+                // adding {} gives each case its own scope block. This is helpful because we define variabkes
+                case ValidateReq.Body: {
+                    if (req.body == undefined) {
+                        throw new ValidationError("Request body is needed");
+                    }
+                    const parsedBodyData = zodSchema.parse(req.body);
+                    // If no issues are found, then we could parse back to the req obj
+                    req.body = parsedBodyData;
+                    break;
+                }
+                case ValidateReq.Params: {
+                    const parsedParamsData = zodSchema.parse(req.params);
+                    req.validatedParams = parsedParamsData as ParamsDictionary;
+                    break;
+                }
+                case ValidateReq.Query: {
+                    // Express 5 does not allow req.query overrides, so we need to append a new field and have
+                    // the controller read from it
+                    const parsedQueryData = zodSchema.parse(req.query);
+                    req.validatedQuery = parsedQueryData as qs.ParsedQs;
+                    break;
+                }
+            }
 
             next();
         } catch (error) {

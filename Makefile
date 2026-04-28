@@ -77,5 +77,5 @@ clean:
 	rm -rf frontend/dist
 
 ## DB
-launch-db-client:
-	cd backend && npx prisma studio --browser none
+launch-db:
+	cd backend && DATABASE_URL="$$(npx tsx -e 'import { envC } from "./src/config/env"; console.log(envC.DATABASE_URL)')" npx prisma studio --browser none

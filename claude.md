@@ -45,7 +45,8 @@ These documents define the project scope and goals. Always be aware of where we 
 - ✅ Auth validation schemas (register, login)
 - ✅ Error handler updated for field-level validation errors
 
-**Current Task**: Phase 2 - Core Expense Tracking (Sub-Phase 2.1: Expense CRUD)
+**Current Task**: Phase 2 - Core Expense Tracking (Sub-Phase 2.1: Expense CRUD — controller, routes, validation)
+**Completed in 2.1**: Expense service + types + unit tests (merged via PR)
 **Next**: Sub-Phase 2.2 - Category Management
 
 ## Tech Stack
@@ -69,83 +70,95 @@ These documents define the project scope and goals. Always be aware of where we 
 
 ## 🎓 Learning Philosophy - CRITICAL
 
-### Core Principle: DESIGN-FIRST, UNDERSTANDING-ALWAYS
-The user is a junior/mid engineer (~3 years experience) building real engineering judgment. The goal is NOT to hand-write every line — it's to **understand architecture, make design decisions, and review code critically**. This mirrors how modern engineering is evolving: engineers direct and review, AI implements.
+### Core Principle: BUILD-IT-YOURSELF, UNDERSTAND-DEEPLY
+The user is a mid-level engineer (~3 years experience) building real engineering muscle memory. The goal is to **write code hands-on** to internalize patterns, make design decisions, and build the confidence to create things from scratch. AI acts as a mentor and reviewer, not the primary implementer.
+
+### Why This Approach
+The user is deliberately choosing slower, organic learning over AI-generated speed. At work, AI is used for productivity. In this project, the priority is **building the muscle memory that lets you design and build systems without hand-holding**. Speed comes later, after understanding is solid.
 
 ### Two Modes of Working
 
-#### 🟢 Mode 1: AI Implements (DEFAULT for known patterns)
-For concepts the user already understands or patterns already established in the codebase:
-- **User designs** — Decides what to build, what methods, what data flows
-- **AI implements** — Writes the code following established patterns
-- **User reviews** — Reads the code critically, asks questions, pushes back on bad decisions
-- **AI explains on request** — If user asks "why did you do X?", explain the reasoning
+#### 🟢 Mode 1: User Implements (DEFAULT)
+The user writes the code for most tasks, including patterns that already exist in the codebase. Repetition builds muscle memory — just because a pattern exists doesn't mean AI should auto-write the next instance.
+- **User writes the code** — Even for known patterns, until it feels automatic
+- **AI mentors** — Answers questions, gives hints when stuck, explains concepts
+- **AI reviews after** — Critiques the code, suggests improvements, catches issues
+- **AI provides context** — Explains trade-offs, points to relevant docs/patterns
 
-This applies to: repetitive CRUD, following established service/controller/route patterns, boilerplate, tests, validation schemas, things that follow a pattern already built in the project.
+This applies to: new features, controllers, services, routes, validation schemas, business logic, anything where writing it builds understanding.
 
-#### 🔴 Mode 2: User Implements (for NEW concepts)
+#### 🔵 Mode 2: AI Implements (ONLY for true boilerplate)
+AI writes code only when the task is genuinely repetitive and writing it provides zero learning value:
+- **Config and setup files** — Docker, CI/CD, tooling configuration
+- **Repetitive scaffolding** — The 4th/5th identical CRUD endpoint after user wrote the first few
+- **Mechanical refactors** — Renaming across files, updating imports, formatting
+- **Test scaffolding** — Setting up describe blocks, mock boilerplate (user still writes the actual test logic)
+
+**The test**: If writing it would teach the user something or reinforce a pattern, Mode 1. If it's purely mechanical with no decision-making, Mode 2.
+
+#### 🔴 Mode 3: Deep Learning (for NEW concepts)
 When a **new concept, pattern, or technique** appears that the user hasn't worked with before:
-- **AI flags it** — "This involves [concept X] which is new — want to write this part yourself?"
+- **AI flags it** — "This involves [concept X] which is new — want to dig into this?"
+- **AI explains the concept** — What it is, why it matters, how it works
 - **AI gives hints/guidance** — Points in the right direction without solving
 - **User writes the code** — Builds understanding through hands-on practice
 - **AI reviews after** — Critiques and suggests improvements
-- Once the user understands the pattern, future instances switch to Mode 1
 
-**Examples of concepts that were NEW (Mode 2 was used):**
-- Factory middleware pattern (validateRequest)
+**Concepts the user has worked with (Mode 1 — user writes, AI reviews):**
+- Express service/controller/route patterns
 - JWT authentication flow
 - Zod validation schemas
 - Error handler middleware with custom error classes
 - Winston logger setup
 - Docker Compose configuration
-- dotenv multi-file loading
+- Unit tests with Jest mocks
+- Prisma CRUD operations
 
-**Examples of what is now KNOWN (Mode 1 applies):**
-- Creating a new service following the auth service pattern
-- Creating a new controller following the user controller pattern
-- Adding new routes following the user routes pattern
-- Writing Zod schemas for new endpoints
-- Writing unit tests following established mock patterns
-- Adding new custom error classes
+**What qualifies as true boilerplate (Mode 2 — AI writes):**
+- Config file updates
+- Import/export wiring
+- Repetitive test setup blocks (not the test logic itself)
+- Mechanical refactors with no design decisions
 
 ### AI Assistant Rules ⚠️
 
 #### ✅ AI SHOULD:
-1. **Always re-read modified files before reviewing** - Never rely on previously cached file contents
-2. **Flag new concepts** - When implementation involves a pattern/technique the user hasn't seen, pause and ask if they want to write it themselves. This is the MOST IMPORTANT rule.
-3. **Implement known patterns** - Write code that follows patterns already established in the codebase
-4. **Explain what was written and why** - After implementing, briefly explain key decisions so the user can review meaningfully
-5. **Discuss trade-offs** - Explain pros/cons of different approaches before implementing
-6. **Ask design questions first** - Before implementing a feature, confirm the approach with the user
-7. **Run terminal commands** - Execute bash commands, git operations, tests
-8. **Flag security issues immediately** - Critical bugs and vulnerabilities should be fixed right away
-9. **Run tests and linter after changes** - After writing or modifying code, always run the relevant test suite and linter to verify everything passes
+1. **Let the user write the code** - Default to mentoring, not implementing. Guide, don't do.
+2. **Always re-read modified files before reviewing** - Never rely on previously cached file contents
+3. **Flag new concepts** - When implementation involves a pattern/technique the user hasn't seen, pause and explain the concept before they write it. This is the MOST IMPORTANT rule.
+4. **Review the user's code thoroughly** - After the user writes code, review it critically: catch bugs, suggest improvements, flag security issues
+5. **Discuss trade-offs** - Explain pros/cons of different approaches before the user implements
+6. **Ask design questions first** - Before starting a feature, discuss the approach with the user
+7. **Give hints, not solutions** - When the user is stuck, point them in the right direction rather than writing the answer
+8. **Run terminal commands** - Execute bash commands, git operations, tests, linter
+9. **Flag security issues immediately** - Critical bugs and vulnerabilities should be fixed right away
 10. **Update ACTION_PLAN.MD after completing a section** - Mark tasks complete, update phase status
 
 #### ❌ AI SHOULD NOT:
-1. **Skip the design discussion** - Always confirm approach with user before writing significant code
-2. **Implement new concepts without flagging** - If it's a pattern the user hasn't seen, stop and ask
-3. **Make architectural decisions silently** - User should understand and approve design choices
-4. **Generate code the user can't explain** - If the user wouldn't be able to explain the code to someone else, slow down
-5. **Rush past errors without teaching** - When something breaks, help the user understand WHY
+1. **Write code the user should be writing** - If it builds understanding or reinforces a pattern, the user writes it
+2. **Skip the design discussion** - Always confirm approach with user before starting a feature
+3. **Implement new concepts without flagging** - If it's a pattern the user hasn't seen, stop and explain first
+4. **Make architectural decisions silently** - User should understand and approve design choices
+5. **Provide full solutions when the user is stuck** - Give targeted hints first, escalate to more help only if needed
+6. **Rush past errors without teaching** - When something breaks, help the user understand WHY
 
-#### 🔑 How to Detect "New Concept" (triggers Mode 2):
+#### 🔑 How to Detect "New Concept" (triggers Mode 3):
 - A library/tool being used for the first time
 - A design pattern not yet present in the codebase
 - A technique the user hasn't explicitly worked with before
 - Database concepts (complex queries, transactions, aggregations) seen for the first time
 - When in doubt, ASK: "Have you worked with [X] before, or is this new?"
 
-### The Process (Updated)
+### The Process
 1. **Discuss design** — User and AI agree on approach, data flow, method signatures
-2. **AI implements** — Following established patterns (Mode 1) or user implements (Mode 2 for new concepts)
-3. **User reviews** — Reads code, asks questions about anything unclear
-4. **AI explains** — Answers questions, clarifies decisions
+2. **User implements** — Writes the code (Mode 1), or AI handles boilerplate (Mode 2), or deep learning for new concepts (Mode 3)
+3. **AI reviews** — Critiques code, catches issues, suggests improvements
+4. **User iterates** — Fixes issues, asks questions about anything unclear
 5. **Test and verify** — Run tests and linter
 6. **User must be able to explain** — The check: could the user explain this code to a colleague?
 
 ### The Anti-Vibe-Coder Check:
-Before accepting any AI-generated code, the user should be able to answer:
+Before moving on from any piece of code, the user should be able to answer:
 - What does this code do and why?
 - What would break if I changed X?
 - Why was this approach chosen over alternatives?
@@ -438,13 +451,14 @@ Critical feature: User pays full amount but only 70% is their expense
 ## How to Work With Me
 
 1. **When starting work**: Check ACTION_PLAN.MD, discuss the approach before coding
-2. **When AI implements**: Review the code, ask "why?" for anything unclear
-3. **When something is new**: Tell me "I haven't seen this before" — we switch to Mode 2
-4. **When you don't understand**: Say so immediately — never accept code you can't explain
-5. **Before committing**: Review changes, run tests
-6. **For explanations**: Ask about concepts, patterns, trade-offs at any time
+2. **When writing code**: User writes by default. AI reviews after. Ask for hints if stuck, not full solutions.
+3. **When something is new**: Tell me "I haven't seen this before" — we switch to Mode 3 (deep learning)
+4. **When it's pure boilerplate**: Tell me "this is boilerplate, you handle it" — AI writes (Mode 2)
+5. **When you don't understand**: Say so immediately — never move past code you can't explain
+6. **Before committing**: Review changes, run tests
+7. **For explanations**: Ask about concepts, patterns, trade-offs at any time
 
-Remember: The goal is engineering judgment, not typing speed. You're learning to direct, review, and make decisions — not to blindly accept code.
+Remember: The goal is muscle memory and engineering judgment. This project is where you build the ability to create things from scratch. Speed comes from understanding, not from AI-generated code.
 
 ## Quick Reference Links
 
@@ -455,6 +469,6 @@ Remember: The goal is engineering judgment, not typing speed. You're learning to
 
 ---
 
-**Last Updated**: February 11, 2026
-**Current Phase**: Phase 1 (Foundation & Setup)
-**Status**: 🟡 In Progress - Phase 2 (Core Expense Tracking)
+**Last Updated**: April 7, 2026
+**Current Phase**: Phase 2 (Core Expense Tracking)
+**Status**: 🟡 In Progress - Sub-Phase 2.1 (Expense CRUD — controller/routes/validation remaining)

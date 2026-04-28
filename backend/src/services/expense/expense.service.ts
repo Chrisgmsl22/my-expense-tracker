@@ -131,10 +131,10 @@ export class ExpenseService {
     public static async getExpenses(
         userId: string,
         filters?: {
-            dateFrom?: Date;
-            dateTo?: Date;
-            categoryId?: string;
-            cardId?: string;
+            dateFrom?: Date | undefined;
+            dateTo?: Date | undefined;
+            categoryId?: string | undefined;
+            cardId?: string | undefined;
         }
     ): Promise<Expense[]> {
         const where: Record<string, unknown> = { userId };
@@ -291,11 +291,11 @@ export class ExpenseService {
     public static async deleteExpense(
         expenseId: string,
         userId: string
-    ): Promise<Expense> {
+    ): Promise<void> {
         // Verify ownership before deleting
         await ExpenseService.getExpenseById(expenseId, userId);
 
-        return await prisma.expense.delete({
+        await prisma.expense.delete({
             where: { id: expenseId },
         });
     }

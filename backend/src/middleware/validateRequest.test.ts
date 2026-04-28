@@ -10,7 +10,7 @@ jest.mock("../utils/logger.ts", () => ({
 }));
 
 const mockZodSchema = { parse: mockParse };
-import { validateRequest } from "./validateRequest.ts";
+import { ValidateReq, validateRequest } from "./validateRequest.ts";
 import { ValidationError } from "../utils/errors.utils.ts";
 import { ZodError } from "zod";
 
@@ -47,7 +47,8 @@ describe("validateRequest middleware", () => {
 
         // Get middleware from factory first
         const middlewareFunction = validateRequest(
-            mockZodSchema as unknown as z.ZodType
+            mockZodSchema as unknown as z.ZodType,
+            ValidateReq.Body
         );
 
         middlewareFunction(
@@ -88,7 +89,8 @@ describe("validateRequest middleware", () => {
         });
 
         const middlewareFunction = validateRequest(
-            mockZodSchema as unknown as z.ZodType
+            mockZodSchema as unknown as z.ZodType,
+            ValidateReq.Body
         );
 
         middlewareFunction(
@@ -123,7 +125,8 @@ describe("validateRequest middleware", () => {
         });
 
         const middlewareFunction = validateRequest(
-            mockZodSchema as unknown as z.ZodType
+            mockZodSchema as unknown as z.ZodType,
+            ValidateReq.Body
         );
 
         middlewareFunction(
@@ -146,7 +149,8 @@ describe("validateRequest middleware", () => {
         });
 
         const middlewareFunction = validateRequest(
-            mockZodSchema as unknown as z.ZodType
+            mockZodSchema as unknown as z.ZodType,
+            ValidateReq.Body
         );
 
         middlewareFunction(

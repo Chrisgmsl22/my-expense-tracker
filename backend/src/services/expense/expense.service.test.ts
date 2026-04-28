@@ -540,12 +540,8 @@ describe("ExpenseService", () => {
             mockExpenseFindUnique.mockResolvedValue(mockExpense);
             mockExpenseDelete.mockResolvedValue(mockExpense);
 
-            const result = await ExpenseService.deleteExpense(
-                "expense-1",
-                TEST_USER_ID
-            );
+            await ExpenseService.deleteExpense("expense-1", TEST_USER_ID);
 
-            expect(result).toEqual(mockExpense);
             expect(mockExpenseDelete).toHaveBeenCalledWith({
                 where: { id: "expense-1" },
             });

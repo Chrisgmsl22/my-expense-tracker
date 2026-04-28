@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { ExpenseService } from "../services/expense/expense.service.ts";
 import type {
+    ExpenseIdParams,
     ExpenseResponse,
     ExpensesResponse,
     GetExpensesQuery,
@@ -36,11 +37,11 @@ export class ExpenseController {
         next: NextFunction
     ): Promise<void> {
         try {
-            const { id } = req.params;
+            const { id } = req.validatedParams as ExpenseIdParams;
             const userId = req.user!.id;
 
             const expense = await ExpenseService.updateExpense(
-                id!,
+                id,
                 userId,
                 req.body
             );
@@ -86,8 +87,8 @@ export class ExpenseController {
     ): Promise<void> {
         try {
             const userId = req.user!.id;
-            const { id } = req.params;
-            const expense = await ExpenseService.getExpenseById(id!, userId);
+            const { id } = req.validatedParams as ExpenseIdParams;
+            const expense = await ExpenseService.getExpenseById(id, userId);
 
             res.status(200).json({
                 success: true,
@@ -106,17 +107,10 @@ export class ExpenseController {
     ): Promise<void> {
         try {
             const userId = req.user!.id;
-            const { id } = req.params;
-            const deletedExpense = await ExpenseService.deleteExpense(
-                id!,
-                userId
-            );
+            const { id } = req.validatedParams as ExpenseIdParams;
+            await ExpenseService.deleteExpense(id, userId);
 
-            res.status(204).json({
-                success: true,
-                message: "Expense deleted successfully",
-                data: deletedExpense,
-            } as ExpenseResponse);
+            res.sendStatus(204);
         } catch (error) {
             next(error);
         }

@@ -291,11 +291,11 @@ export class ExpenseService {
     public static async deleteExpense(
         expenseId: string,
         userId: string
-    ): Promise<Expense> {
+    ): Promise<void> {
         // Verify ownership before deleting
         await ExpenseService.getExpenseById(expenseId, userId);
 
-        return await prisma.expense.delete({
+        await prisma.expense.delete({
             where: { id: expenseId },
         });
     }

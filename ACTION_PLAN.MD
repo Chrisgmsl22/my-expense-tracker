@@ -174,6 +174,25 @@ Check for:
 
 ---
 
+## Global PR Strategy (applies to all phases below)
+
+From Phase 2 onwards, every sub-phase is structured as **vertical slices** — small, independently shippable PRs marked with `[PR]`.
+
+**Goal**: ship one PR every 1-2 days. Each slice should be:
+-   Reviewable in under 30 minutes
+-   Ends with passing tests + green CI
+-   Not bundled with unrelated work
+
+**Default split pattern per feature domain** (budgets, income, debt, etc.):
+1.  Service + types + unit tests `[PR]`
+2.  Cross-domain integrations (e.g., dashboard updates) `[PR]`
+3.  Controller + routes + validation + controller unit tests `[PR]`
+4.  Manual E2E testing in Postman (no PR — just the verification step)
+
+When in doubt, split smaller. It's better to ship 3 small PRs than 1 large one.
+
+---
+
 ## Phase 1: Foundation & Setup
 
 **Goal**: Project infrastructure, database, authentication
@@ -550,12 +569,13 @@ A vertical slice = a self-contained piece of work that can be reviewed, tested, 
 -   [x] Test with invalid category UUID
 -   [x] Test ownership (another user's expense)
 
-#### 2.1.6: Controller Unit Tests (this PR)
+#### 2.1.6: Controller Unit Tests ✅
 
--   [ ] Add expense.controller.test.ts
--   [ ] Test all 5 handler methods (mock service layer)
--   [ ] Test success responses (status code, response shape)
--   [ ] Test error propagation to next(error)
+-   [x] Add expense.controller.test.ts
+-   [x] Test all 5 handler methods (mock service layer)
+-   [x] Test success responses (status code, response shape)
+-   [x] Test error propagation to next(error) — parameterized with `it.each`
+-   [x] Verify error message propagation
 
 **Checkpoint**: Can CRUD expenses, actualExpenditure calculated, filtering works, only user's expenses accessible
 
@@ -783,27 +803,31 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 3.1: Budget System
 
-#### 3.1.1: Create Budget Service
+#### 3.1.1: Budget Service [PR]
 
 -   [ ] Create services/budget.service.ts
 -   [ ] Implement setBudget (category, month, year, amount)
 -   [ ] Implement getBudgets (calculate spent, remaining, percentage, status)
 -   [ ] Implement getBudgetStatus (specific category)
 -   [ ] Implement deleteBudget
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests
 
-#### 3.1.2: Add Budget Alert Logic
+#### 3.1.2: Budget Alert Logic + Dashboard Integration [PR]
 
 -   [ ] Create calculateBudgetStatus utility
 -   [ ] Add budget alerts to dashboard (over budget, approaching budget)
+-   [ ] Unit tests for alert logic
 
-#### 3.1.3: Create Budget Controller & Routes
+#### 3.1.3: Budget Controller + Routes + Validation [PR]
 
 -   [ ] Create controllers/budget.controller.ts
--   [ ] Implement handlers
--   [ ] Create routes/budget.routes.ts
--   [ ] Define routes (GET, POST, PUT, DELETE /api/budgets)
+-   [ ] Create schemas/budget.schema.ts (Zod)
+-   [ ] Create routes/budget.routes.ts (GET, POST, PATCH, DELETE /api/budgets)
 -   [ ] Define GET /api/budgets/alerts
--   [ ] Mount routes
+-   [ ] Apply auth middleware
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
 #### 3.1.4: Test Budget System
 
@@ -820,7 +844,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 3.2: Income Management
 
-#### 3.2.1: Create Income Service
+#### 3.2.1: Income Service [PR]
 
 -   [ ] Create services/income.service.ts
 -   [ ] Implement createIncome (fixed/variable)
@@ -828,20 +852,24 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Implement updateIncome
 -   [ ] Implement deleteIncome
 -   [ ] Implement getIncomeSummary
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests
 
-#### 3.2.2: Add Income to Dashboard
+#### 3.2.2: Add Income to Dashboard [PR]
 
 -   [ ] Update dashboardService
 -   [ ] Include income summary (fixed, variable, total)
 -   [ ] Calculate available after committed money
+-   [ ] Unit tests for dashboard integration
 
-#### 3.2.3: Create Income Controller & Routes
+#### 3.2.3: Income Controller + Routes + Validation [PR]
 
 -   [ ] Create controllers/income.controller.ts
--   [ ] Implement handlers
--   [ ] Create routes/income.routes.ts
--   [ ] Define routes (GET, POST, PUT, DELETE /api/income)
--   [ ] Mount routes
+-   [ ] Create schemas/income.schema.ts (Zod)
+-   [ ] Create routes/income.routes.ts (GET, POST, PATCH, DELETE /api/income)
+-   [ ] Apply auth middleware
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
 #### 3.2.4: Test Income Management
 
@@ -857,21 +885,24 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 3.3: Recurring Expenses Automation
 
-#### 3.3.1: Create Recurring Expense Logic
+#### 3.3.1: Recurring Expense Service [PR]
 
 -   [ ] Create services/recurring.service.ts
 -   [ ] Implement getRecurringExpenses
 -   [ ] Implement generateMonthlyRecurringExpenses (check duplicates, create instances)
 -   [ ] Implement deleteRecurringTemplate
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests
 
-#### 3.3.2: Add Month Rollover Endpoint
+#### 3.3.2: Month Rollover Endpoint [PR]
 
--   [ ] Create POST /api/expenses/rollover
+-   [ ] Add POST /api/expenses/rollover (controller + route + validation)
 -   [ ] Call generateMonthlyRecurringExpenses
 -   [ ] Return summary
--   [ ] Test (mark expenses as recurring, call rollover, verify created, call again for idempotency)
+-   [ ] Manual Postman testing (idempotency check)
+-   [ ] Controller unit tests
 
-#### 3.3.3: Create Cron Job for Auto-Rollover
+#### 3.3.3: Cron Job for Auto-Rollover [PR]
 
 -   [ ] Install node-cron
 -   [ ] Create jobs/monthlyRollover.job.ts
@@ -879,6 +910,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] For each user, call generateMonthlyRecurringExpenses
 -   [ ] Log results
 -   [ ] Register job in server startup
+-   [ ] Unit tests for job logic
 
 #### 3.3.4: Test Recurring System
 
@@ -893,7 +925,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 3.4: Debt Tracking
 
-#### 3.4.1: Create Debt Service
+#### 3.4.1: Debt Service [PR]
 
 -   [ ] Create services/debt.service.ts
 -   [ ] Implement createDebt
@@ -901,21 +933,25 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Implement updateDebt
 -   [ ] Implement recordPayment (update remaining amount)
 -   [ ] Implement deleteDebt
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests
 
-#### 3.4.2: Add Debt to Dashboard
+#### 3.4.2: Add Debt to Dashboard [PR]
 
 -   [ ] Update dashboardService
 -   [ ] Include debt summary (total debt, monthly payments)
 -   [ ] Calculate committed money including debt payments
+-   [ ] Unit tests
 
-#### 3.4.3: Create Debt Controller & Routes
+#### 3.4.3: Debt Controller + Routes + Validation [PR]
 
 -   [ ] Create controllers/debt.controller.ts
--   [ ] Implement handlers
--   [ ] Create routes/debt.routes.ts
--   [ ] Define routes (GET, POST, PUT, DELETE /api/debts)
+-   [ ] Create schemas/debt.schema.ts (Zod)
+-   [ ] Create routes/debt.routes.ts (GET, POST, PATCH, DELETE /api/debts)
 -   [ ] Define POST /api/debts/:id/payment
--   [ ] Mount routes
+-   [ ] Apply auth middleware
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
 #### 3.4.4: Test Debt Management
 
@@ -932,7 +968,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 3.5: Savings Goals
 
-#### 3.5.1: Create Goal Service
+#### 3.5.1: Goal Service [PR]
 
 -   [ ] Create services/goal.service.ts
 -   [ ] Implement createGoal (name, target, deadline)
@@ -940,20 +976,24 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Implement updateGoal
 -   [ ] Implement addToGoal (increase current amount)
 -   [ ] Implement deleteGoal
+-   [ ] Add TypeScript interfaces
+-   [ ] Unit tests
 
-#### 3.5.2: Add Goals to Dashboard
+#### 3.5.2: Add Goals to Dashboard [PR]
 
 -   [ ] Update dashboardService
 -   [ ] Include goals summary (progress bars)
+-   [ ] Unit tests
 
-#### 3.5.3: Create Goal Controller & Routes
+#### 3.5.3: Goal Controller + Routes + Validation [PR]
 
 -   [ ] Create controllers/goal.controller.ts
--   [ ] Implement handlers
--   [ ] Create routes/goal.routes.ts
--   [ ] Define routes (GET, POST, PUT, DELETE /api/goals)
+-   [ ] Create schemas/goal.schema.ts (Zod)
+-   [ ] Create routes/goal.routes.ts (GET, POST, PATCH, DELETE /api/goals)
 -   [ ] Define POST /api/goals/:id/contribute
--   [ ] Mount routes
+-   [ ] Apply auth middleware
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
 #### 3.5.4: Test Goals System
 
@@ -1019,21 +1059,23 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 4.1: OpenAI Setup & Service
 
-#### 4.1.1: Install OpenAI SDK
+#### 4.1.1: OpenAI SDK Setup [PR]
 
 -   [ ] Install openai package
 -   [ ] Add OPENAI_API_KEY to .env
 -   [ ] Create .env.example entry
+-   [ ] Update env validation in config
 
-#### 4.1.2: Create AI Service
+#### 4.1.2: AI Service Foundation [PR]
 
 -   [ ] Create services/ai.service.ts
 -   [ ] Implement OpenAI client initialization
 -   [ ] Create helper method callOpenAI(prompt, systemPrompt)
 -   [ ] Add error handling for API failures
 -   [ ] Add retry logic (optional)
+-   [ ] Unit tests (mock OpenAI client)
 
-#### 4.1.3: Implement Expense Analysis
+#### 4.1.3: Expense Analysis [PR]
 
 -   [ ] Implement analyzeExpenses(userId, month, year, language):
     -   Get all expenses for month
@@ -1041,6 +1083,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
     -   Build comprehensive prompt with financial data
     -   Request structured JSON response
     -   Return analysis object
+-   [ ] Unit tests
 
 #### 4.1.4: Test AI Service
 
@@ -1057,25 +1100,27 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 4.2: AI-Powered Features
 
-#### 4.2.1: Implement Smart Categorization
+#### 4.2.1: Smart Categorization [PR]
 
 -   [ ] In ai.service, implement suggestCategory(description, amount):
     -   Build prompt with expense details
     -   Request category suggestion with confidence
     -   Return { categoryId, confidence }
--   [ ] Add endpoint POST /api/ai/categorize
--   [ ] Test with various expense descriptions
+-   [ ] Add controller + route + validation: POST /api/ai/categorize
+-   [ ] Manual testing with various expense descriptions
+-   [ ] Unit tests
 
-#### 4.2.2: Implement Anomaly Detection
+#### 4.2.2: Anomaly Detection [PR]
 
 -   [ ] Implement detectAnomalies(userId, month, year):
     -   Get user's spending history
     -   Build prompt with patterns
     -   Request anomaly analysis
     -   Return array of anomalies
--   [ ] Add to dashboard or create endpoint GET /api/ai/anomalies
+-   [ ] Add controller + route + validation: GET /api/ai/anomalies
+-   [ ] Unit tests
 
-#### 4.2.3: Implement Personalized Tips
+#### 4.2.3: Personalized Tips [PR]
 
 -   [ ] Implement generateTips(userId, month, year, language):
     -   Get financial overview
@@ -1083,6 +1128,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
     -   Request 3-5 tips
     -   Return tips array
 -   [ ] Add to dashboard
+-   [ ] Unit tests
 
 #### 4.2.4: Test AI Features
 
@@ -1097,31 +1143,34 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 4.3: AI Access Control
 
-#### 4.3.1: Add AI Enable Flag
+#### 4.3.1: AI Enable Flag Middleware [PR]
 
--   [ ] User model already has aiEnabled field
--   [ ] Create middleware checkAIEnabled
+-   [ ] Create middleware checkAIEnabled (User model already has aiEnabled field)
 -   [ ] Apply to all AI endpoints
+-   [ ] Middleware unit tests
 
-#### 4.3.2: Create AI Settings Endpoint
+#### 4.3.2: AI Settings Endpoint [PR]
 
--   [ ] Add PUT /api/users/settings/ai
+-   [ ] Add PATCH /api/users/settings/ai (controller + route + validation)
 -   [ ] Allow toggling aiEnabled
--   [ ] Test toggling on/off
+-   [ ] Manual testing
+-   [ ] Controller unit tests
 
-#### 4.3.3: Track AI Usage
+#### 4.3.3: AI Usage Tracking [PR]
 
 -   [ ] Create AIUsage model (userId, endpoint, timestamp, cost)
--   [ ] Log each AI call
+-   [ ] Migration
+-   [ ] Log each AI call (in ai.service)
 -   [ ] Create GET /api/users/ai-usage endpoint
--   [ ] Display usage stats
+-   [ ] Unit tests
 
-#### 4.3.4: Implement Rate Limiting for AI
+#### 4.3.4: AI Rate Limiting [PR]
 
 -   [ ] Install express-rate-limit
 -   [ ] Create AI-specific rate limiter (e.g., 20 requests/hour)
 -   [ ] Apply to AI endpoints
--   [ ] Test rate limit
+-   [ ] Manual testing of rate limit
+-   [ ] Unit tests
 
 **Checkpoint**: AI access controlled, usage tracked, rate limited
 
@@ -1181,26 +1230,28 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 5.1: Email Service Setup
 
-#### 5.1.1: Install Email Service
+#### 5.1.1: Email Provider Setup [PR]
 
 -   [ ] Choose email provider (SendGrid or Resend)
 -   [ ] Install SDK (e.g., @sendgrid/mail)
 -   [ ] Add API key to .env
+-   [ ] Update env validation in config
+
+#### 5.1.2: Email Service [PR]
+
 -   [ ] Create services/email.service.ts
-
-#### 5.1.2: Create Email Service
-
 -   [ ] Implement sendEmail(to, subject, html) method
 -   [ ] Add error handling
 -   [ ] Add email validation
--   [ ] Test with simple email
+-   [ ] Unit tests (mock provider SDK)
 
-#### 5.1.3: Create Email Templates
+#### 5.1.3: Email Templates [PR]
 
 -   [ ] Create templates/email/ directory
 -   [ ] Create weeklyReport.html template
 -   [ ] Add CSS for email styling (inline styles)
 -   [ ] Create template utility to populate data
+-   [ ] Unit tests for template rendering
 
 #### 5.1.4: Test Email Sending
 
@@ -1215,7 +1266,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 5.2: Weekly Summary Report
 
-#### 5.2.1: Create Report Service
+#### 5.2.1: Report Service [PR]
 
 -   [ ] Create services/report.service.ts
 -   [ ] Implement generateWeeklySummary(userId, language):
@@ -1224,42 +1275,37 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
     -   Get budget status
     -   Get AI insights
     -   Format data for template
+-   [ ] Unit tests
 
-#### 5.2.2: Generate Chart Images
+#### 5.2.2: Chart Image Generation [PR]
 
 -   [ ] Install chart-to-image library (or use external service)
 -   [ ] Implement generatePieChartImage(data)
 -   [ ] Save to temp directory or upload to S3
 -   [ ] Include image URL in email
+-   [ ] Unit tests
 
-#### 5.2.3: Build Email Content
+#### 5.2.3: Weekly Email Content [PR]
 
 -   [ ] Populate weekly report template with data
--   [ ] Include:
-    -   Total spent
-    -   Top categories
-    -   Budget alerts
-    -   AI insights
-    -   Embedded pie chart
-    -   Link to full dashboard
+-   [ ] Include: total spent, top categories, budget alerts, AI insights, pie chart, dashboard link
 -   [ ] Support English and Spanish
+-   [ ] Unit tests for content rendering
 
-#### 5.2.4: Create Weekly Email Cron Job
+#### 5.2.4: Weekly Email Cron Job [PR]
 
 -   [ ] Create jobs/weeklyEmail.job.ts
 -   [ ] Schedule for Sunday 5pm (0 17 \* \* 0)
--   [ ] For each user with aiEnabled:
-    -   Generate report
-    -   Send email
-    -   Log success/failure
+-   [ ] For each user with aiEnabled: generate report, send email, log success/failure
 -   [ ] Register job in server startup
+-   [ ] Unit tests
 
-#### 5.2.5: Add Manual Trigger Endpoint
+#### 5.2.5: Manual Trigger Endpoint [PR]
 
--   [ ] Create POST /api/reports/send-weekly
+-   [ ] Create POST /api/reports/send-weekly (controller + route + validation)
 -   [ ] Allow user to request email immediately
--   [ ] Test manual trigger
--   [ ] Test scheduled job
+-   [ ] Manual Postman testing
+-   [ ] Controller unit tests
 
 **Checkpoint**: Weekly emails send automatically, charts embedded, bilingual support
 
@@ -1267,37 +1313,29 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 5.3: Export Functionality
 
-#### 5.3.1: Implement CSV Export
+#### 5.3.1: CSV Export [PR]
 
 -   [ ] Install csv-writer or similar
--   [ ] Create utils/csvExport.ts
--   [ ] Implement exportExpensesToCSV(expenses):
-    -   Format expense data
-    -   Generate CSV
-    -   Return buffer or file path
--   [ ] Create GET /api/expenses/export/csv endpoint
+-   [ ] Create utils/csvExport.ts (exportExpensesToCSV)
+-   [ ] Add controller + route + validation: GET /api/expenses/export/csv
 -   [ ] Add query filters (month, year, category)
--   [ ] Test download
+-   [ ] Manual testing
+-   [ ] Unit tests
 
-#### 5.3.2: Implement PDF Export
+#### 5.3.2: PDF Export [PR]
 
 -   [ ] Install pdfkit or puppeteer
--   [ ] Create utils/pdfExport.ts
--   [ ] Design PDF layout:
-    -   Header with user info
-    -   Summary section
-    -   Expense table
-    -   Charts
-    -   Footer with totals
--   [ ] Implement exportExpensesToPDF(userId, month, year)
--   [ ] Create GET /api/expenses/export/pdf endpoint
--   [ ] Test download
+-   [ ] Create utils/pdfExport.ts (exportExpensesToPDF)
+-   [ ] Design PDF layout (header, summary, table, charts, footer)
+-   [ ] Add controller + route + validation: GET /api/expenses/export/pdf
+-   [ ] Manual testing
+-   [ ] Unit tests
 
-#### 5.3.3: Add Export to Email Option
+#### 5.3.3: Export Attachment in Weekly Email [PR]
 
 -   [ ] Add checkbox in weekly email settings
 -   [ ] If enabled, attach PDF to weekly email
--   [ ] Test attachment delivery
+-   [ ] Unit tests
 
 #### 5.3.4: Test Export Features
 
@@ -1367,14 +1405,16 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 6.1: Frontend Setup
 
-#### 6.1.1: Initialize React Project
+> Note: Frontend slices below are mostly self-contained pages/features. Each `[PR]` is independently shippable. Bundle together only if a feature is truly trivial.
+
+#### 6.1.1: Initialize React Project [PR]
 
 -   [ ] Create React app with Vite + TypeScript
 -   [ ] Set up folder structure (components, pages, services, hooks, utils, types)
 -   [ ] Install dependencies (axios, react-query, react-hook-form, zod)
 -   [ ] Configure TypeScript
 
-#### 6.1.2: Install and Configure Tailwind
+#### 6.1.2: Tailwind + shadcn/ui Setup [PR]
 
 -   [ ] Install Tailwind CSS
 -   [ ] Configure tailwind.config.js
@@ -1382,7 +1422,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Install shadcn/ui CLI
 -   [ ] Install base components (Button, Input, Card, etc.)
 
-#### 6.1.3: Set Up Routing
+#### 6.1.3: Routing + ProtectedRoute [PR]
 
 -   [ ] Install react-router-dom
 -   [ ] Create router configuration
@@ -1390,7 +1430,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Create ProtectedRoute component
 -   [ ] Test navigation
 
-#### 6.1.4: Configure API Client
+#### 6.1.4: API Client + TanStack Query [PR]
 
 -   [ ] Create services/api.ts
 -   [ ] Set up axios instance with base URL
@@ -1398,7 +1438,9 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Add response interceptor (handle 401, refresh token)
 -   [ ] Create API service methods
 
-#### 6.1.5: Set Up TanStack Query
+#### 6.1.5: TanStack Query Configuration
+
+> Folded into 6.1.4 above (API client + TanStack are tightly coupled).
 
 -   [ ] Create QueryClient
 -   [ ] Wrap app with QueryClientProvider
@@ -1411,7 +1453,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 6.2: Authentication UI
 
-#### 6.2.1: Create Auth Pages
+#### 6.2.1: Auth Pages (Login + Register) [PR]
 
 -   [ ] Create pages/Login.tsx
 -   [ ] Create pages/Register.tsx
@@ -1419,7 +1461,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Design register form (name, email, password)
 -   [ ] Add Tailwind styling
 
-#### 6.2.2: Implement Auth Logic
+#### 6.2.2: Auth Logic + AuthContext [PR]
 
 -   [ ] Create hooks/useAuth.ts
 -   [ ] Implement login mutation
@@ -1428,7 +1470,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Create AuthContext for global auth state
 -   [ ] Implement logout
 
-#### 6.2.3: Add Form Validation
+#### 6.2.3: Form Validation (React Hook Form + Zod) [PR]
 
 -   [ ] Create validation schemas with Zod
 -   [ ] Integrate React Hook Form
@@ -1450,14 +1492,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 6.3: Dashboard & Visualizations
 
-#### 6.3.1: Create Dashboard Layout
+#### 6.3.1: Dashboard Layout + Summary Cards [PR]
 
 -   [ ] Create pages/Dashboard.tsx
 -   [ ] Create layout with sidebar/header
 -   [ ] Add summary cards (income, spent, budget, savings)
 -   [ ] Design responsive grid
 
-#### 6.3.2: Fetch Dashboard Data
+#### 6.3.2: Dashboard Data Fetching [PR]
 
 -   [ ] Create hooks/useDashboard.ts
 -   [ ] Use TanStack Query to fetch dashboard data
@@ -1465,7 +1507,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Handle errors
 -   [ ] Display data in cards
 
-#### 6.3.3: Add Pie Chart
+#### 6.3.3: Pie Chart (Category Breakdown) [PR]
 
 -   [ ] Install Recharts
 -   [ ] Create components/PieChart.tsx
@@ -1474,7 +1516,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Add legend
 -   [ ] Make responsive
 
-#### 6.3.4: Add Recent Expenses List
+#### 6.3.4: Recent Expenses List [PR]
 
 -   [ ] Create components/RecentExpenses.tsx
 -   [ ] Fetch recent expenses
@@ -1482,7 +1524,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Add card color indicators
 -   [ ] Add click to view details
 
-#### 6.3.5: Add Budget Status Section
+#### 6.3.5: Budget Status Section [PR]
 
 -   [ ] Create components/BudgetStatus.tsx
 -   [ ] Fetch budget data
@@ -1490,7 +1532,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Color-code based on status (green/yellow/red)
 -   [ ] Show alerts for over-budget categories
 
-#### 6.3.6: Add Debt Overview
+#### 6.3.6: Debt Overview [PR]
 
 -   [ ] Create components/DebtOverview.tsx
 -   [ ] Fetch debt data
@@ -1498,7 +1540,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Show individual debts with progress
 -   [ ] Display monthly payment totals
 
-#### 6.3.7: Add Goals Section
+#### 6.3.7: Goals Section [PR]
 
 -   [ ] Create components/GoalsSection.tsx
 -   [ ] Fetch goals
@@ -1506,7 +1548,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Show percentage complete
 -   [ ] Add quick contribute button
 
-#### 6.3.8: Add Month Selector
+#### 6.3.8: Month Selector [PR]
 
 -   [ ] Create components/MonthSelector.tsx
 -   [ ] Allow switching between months
@@ -1518,7 +1560,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 6.4: Expense Management UI
 
-#### 6.4.1: Create Expenses Page
+#### 6.4.1: Expenses List Page [PR]
 
 -   [ ] Create pages/Expenses.tsx
 -   [ ] Fetch all expenses
@@ -1526,7 +1568,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Add pagination
 -   [ ] Add filters (date range, category, card)
 
-#### 6.4.2: Create Add Expense Modal
+#### 6.4.2: Add Expense Modal [PR]
 
 -   [ ] Create components/AddExpenseModal.tsx
 -   [ ] Build form with all fields:
@@ -1544,7 +1586,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Refetch expenses on success
 -   [ ] Show success/error messages
 
-#### 6.4.3: Create Edit Expense Modal
+#### 6.4.3: Edit Expense Modal [PR]
 
 -   [ ] Create components/EditExpenseModal.tsx
 -   [ ] Pre-populate form with expense data
@@ -1552,21 +1594,21 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Handle actualExpenditure recalculation
 -   [ ] Show updated expense
 
-#### 6.4.4: Add Delete Functionality
+#### 6.4.4: Delete Functionality + Confirmation [PR]
 
 -   [ ] Add delete button to each expense
 -   [ ] Confirm deletion dialog
 -   [ ] Delete expense
 -   [ ] Refetch list
 
-#### 6.4.5: Add Bulk Actions
+#### 6.4.5: Bulk Actions [PR]
 
 -   [ ] Add checkboxes to expense rows
 -   [ ] Select all functionality
 -   [ ] Bulk delete
 -   [ ] Bulk categorize (optional)
 
-#### 6.4.6: Add Settlement Features
+#### 6.4.6: Settlement Features [PR]
 
 -   [ ] Show settlement status badge for shared expenses
 -   [ ] Add "Mark as Paid" button
@@ -1580,7 +1622,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 6.5: Categories, Cards, and Settings
 
-#### 6.5.1: Create Categories Page
+#### 6.5.1: Categories Page [PR]
 
 -   [ ] Create pages/Categories.tsx
 -   [ ] Display system + custom categories
@@ -1589,7 +1631,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Edit/delete functionality
 -   [ ] Mark as relevant/non-relevant
 
-#### 6.5.2: Create Cards Page
+#### 6.5.2: Cards Page [PR]
 
 -   [ ] Create pages/Cards.tsx
 -   [ ] Display all cards with colors
@@ -1598,7 +1640,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Edit/delete functionality
 -   [ ] Display current month spending per card
 
-#### 6.5.3: Create Budgets Page
+#### 6.5.3: Budgets Page [PR]
 
 -   [ ] Create pages/Budgets.tsx
 -   [ ] List all budgets with status
@@ -1607,7 +1649,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Delete budgets
 -   [ ] Show visual progress bars
 
-#### 6.5.4: Create Income Page
+#### 6.5.4: Income Page [PR]
 
 -   [ ] Create pages/Income.tsx
 -   [ ] Display fixed income
@@ -1616,7 +1658,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Show monthly totals
 -   [ ] Edit/delete functionality
 
-#### 6.5.5: Create Debts Page
+#### 6.5.5: Debts Page [PR]
 
 -   [ ] Create pages/Debts.tsx
 -   [ ] List all debts
@@ -1625,7 +1667,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Record payment functionality
 -   [ ] Edit/delete debts
 
-#### 6.5.6: Create Goals Page
+#### 6.5.6: Goals Page [PR]
 
 -   [ ] Create pages/Goals.tsx
 -   [ ] Display all goals with progress
@@ -1634,7 +1676,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Edit/delete goals
 -   [ ] Visual progress indicators
 
-#### 6.5.7: Create Settings Page
+#### 6.5.7: Settings Page [PR]
 
 -   [ ] Create pages/Settings.tsx
 -   [ ] Profile settings (name, email)
@@ -1651,7 +1693,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 6.6: Internationalization
 
-#### 6.6.1: Set Up i18n
+#### 6.6.1: i18n Setup [PR]
 
 -   [ ] Install react-i18next
 -   [ ] Create locales/en.json
@@ -1659,14 +1701,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Configure i18n
 -   [ ] Wrap app with I18nextProvider
 
-#### 6.6.2: Add Translations
+#### 6.6.2: Translations (EN/ES) [PR]
 
 -   [ ] Translate all UI strings
 -   [ ] Translate form labels
 -   [ ] Translate error messages
 -   [ ] Translate dashboard sections
 
-#### 6.6.3: Add Language Switcher
+#### 6.6.3: Language Switcher [PR]
 
 -   [ ] Create LanguageSwitcher component
 -   [ ] Add to settings or footer
@@ -1686,40 +1728,40 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 6.7: Polish & UX
 
-#### 6.7.1: Add Loading States
+#### 6.7.1: Loading States + Skeletons [PR]
 
 -   [ ] Create LoadingSpinner component
 -   [ ] Add skeletons for data loading
 -   [ ] Show loading on all async operations
 
-#### 6.7.2: Add Error Handling
+#### 6.7.2: Error Handling Components [PR]
 
 -   [ ] Create ErrorMessage component
 -   [ ] Display API errors to user
 -   [ ] Add retry functionality
 -   [ ] Handle network errors
 
-#### 6.7.3: Add Toast Notifications
+#### 6.7.3: Toast Notifications [PR]
 
 -   [ ] Install toast library (sonner or react-hot-toast)
 -   [ ] Show success toasts on create/update/delete
 -   [ ] Show error toasts on failures
 
-#### 6.7.4: Add Animations
+#### 6.7.4: Animations + Transitions [PR]
 
 -   [ ] Add page transitions
 -   [ ] Animate modal appearances
 -   [ ] Add hover effects
 -   [ ] Smooth scroll
 
-#### 6.7.5: Mobile Responsiveness
+#### 6.7.5: Mobile Responsiveness [PR]
 
 -   [ ] Test all pages on mobile
 -   [ ] Adjust layouts for small screens
 -   [ ] Make tables scrollable
 -   [ ] Add mobile menu
 
-#### 6.7.6: Accessibility
+#### 6.7.6: Accessibility (ARIA + keyboard nav) [PR]
 
 -   [ ] Add ARIA labels
 -   [ ] Ensure keyboard navigation
@@ -1788,6 +1830,8 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 7.1: Backend Unit Tests
 
+> Note: If you've been writing tests as you build (per Phase 2-6 strategy), most of this is already done. This sub-phase becomes a "fill the gaps" pass.
+
 #### 7.1.1: Set Up Jest
 
 -   [ ] Install Jest and types
@@ -1832,7 +1876,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Test dashboard service
 -   [ ] Test AI service (mock OpenAI)
 
-#### 7.1.6: Test Utilities
+#### 7.1.6: Test Utilities [PR]
 
 -   [ ] Test logger
 -   [ ] Test validation schemas
@@ -1845,14 +1889,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 7.2: Backend Integration Tests
 
-#### 7.2.1: Set Up Integration Testing
+#### 7.2.1: Integration Testing Setup (Supertest + test DB) [PR]
 
 -   [ ] Install Supertest
 -   [ ] Create test database
 -   [ ] Create test setup/teardown
 -   [ ] Clear database between tests
 
-#### 7.2.2: Test Auth Endpoints
+#### 7.2.2: Auth Endpoints Integration Tests [PR]
 
 -   [ ] Create tests/integration/auth.test.ts
 -   [ ] Test POST /api/auth/register
@@ -1860,7 +1904,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Test invalid credentials
 -   [ ] Test duplicate registration
 
-#### 7.2.3: Test Expense Endpoints
+#### 7.2.3: Expense Endpoints Integration Tests [PR]
 
 -   [ ] Create tests/integration/expenses.test.ts
 -   [ ] Test POST /api/expenses (create)
@@ -1870,13 +1914,13 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Test DELETE /api/expenses/:id
 -   [ ] Test with invalid auth token
 
-#### 7.2.4: Test Protected Endpoints
+#### 7.2.4: Auth/Authorization Integration Tests [PR]
 
 -   [ ] Test all CRUD endpoints require auth
 -   [ ] Test users can't access other users' data
 -   [ ] Test invalid tokens rejected
 
-#### 7.2.5: Test Complex Flows
+#### 7.2.5: Complex Flow Integration Tests [PR]
 
 -   [ ] Test full expense creation flow
 -   [ ] Test shared expense with settlement
@@ -1897,7 +1941,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Add missing tests
 -   [ ] Aim for 85%+ coverage
 
-#### 7.3.2: Set Up GitHub Actions
+#### 7.3.2: GitHub Actions CI [PR]
 
 -   [ ] Create .github/workflows/test.yml
 -   [ ] Run tests on every push
@@ -1905,7 +1949,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Fail build if tests fail
 -   [ ] Add coverage reporting
 
-#### 7.3.3: Add Code Quality Checks
+#### 7.3.3: Code Quality Checks (lint/types/format) [PR]
 
 -   [ ] Add ESLint check to CI
 -   [ ] Add TypeScript compile check
@@ -1974,14 +2018,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 8.1: AWS Infrastructure Setup
 
-#### 8.1.1: Set Up AWS Account
+#### 8.1.1: AWS Account + IAM Setup [PR]
 
 -   [ ] Create AWS account
 -   [ ] Set up billing alerts
 -   [ ] Create IAM user with appropriate permissions
 -   [ ] Configure AWS CLI locally
 
-#### 8.1.2: Set Up RDS PostgreSQL
+#### 8.1.2: RDS PostgreSQL Setup [PR]
 
 -   [ ] Create RDS PostgreSQL instance
 -   [ ] Configure security group
@@ -1989,14 +2033,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Test connection from local
 -   [ ] Run Prisma migrations on production DB
 
-#### 8.1.3: Set Up ElastiCache Redis
+#### 8.1.3: ElastiCache Redis Setup [PR]
 
 -   [ ] Create ElastiCache Redis cluster
 -   [ ] Configure security group
 -   [ ] Note connection endpoint
 -   [ ] Test connection
 
-#### 8.1.4: Set Up S3 Bucket
+#### 8.1.4: S3 Bucket Setup [PR]
 
 -   [ ] Create S3 bucket for file storage
 -   [ ] Configure bucket policies
@@ -2009,21 +2053,21 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 8.2: Application Deployment
 
-#### 8.2.1: Create Production Dockerfile
+#### 8.2.1: Production Dockerfile [PR]
 
 -   [ ] Create Dockerfile (multi-stage build)
 -   [ ] Optimize for production
 -   [ ] Test build locally
 -   [ ] Push to Docker Hub or AWS ECR
 
-#### 8.2.2: Set Up EC2 Instance
+#### 8.2.2: EC2 Instance Setup [PR]
 
 -   [ ] Launch EC2 instance (t3.small or similar)
 -   [ ] Configure security group (allow 80, 443, 22)
 -   [ ] SSH into instance
 -   [ ] Install Docker and Docker Compose
 
-#### 8.2.3: Deploy Backend
+#### 8.2.3: Backend Deployment [PR]
 
 -   [ ] Clone repository on EC2
 -   [ ] Create production .env
@@ -2031,14 +2075,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Verify app running
 -   [ ] Test health endpoint
 
-#### 8.2.4: Set Up Nginx Reverse Proxy
+#### 8.2.4: Nginx Reverse Proxy + SSL [PR]
 
 -   [ ] Install Nginx on EC2
 -   [ ] Configure reverse proxy to app
 -   [ ] Set up SSL with Let's Encrypt
 -   [ ] Test HTTPS access
 
-#### 8.2.5: Deploy Frontend
+#### 8.2.5: Frontend Deployment [PR]
 
 -   [ ] Build frontend for production
 -   [ ] Upload to S3 or serve from EC2
@@ -2051,20 +2095,20 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 8.3: Monitoring & Maintenance
 
-#### 8.3.1: Set Up CloudWatch
+#### 8.3.1: CloudWatch Logs + Alarms [PR]
 
 -   [ ] Configure CloudWatch logs
 -   [ ] Set up log groups
 -   [ ] Stream application logs
 -   [ ] Create alarms (CPU, memory, errors)
 
-#### 8.3.2: Set Up Database Backups
+#### 8.3.2: Database Backups [PR]
 
 -   [ ] Configure RDS automated backups
 -   [ ] Test restore process
 -   [ ] Document backup procedure
 
-#### 8.3.3: Set Up CI/CD for Deployment
+#### 8.3.3: CI/CD Auto-Deploy [PR]
 
 -   [ ] Add deploy job to GitHub Actions
 -   [ ] Trigger on merge to main
@@ -2072,7 +2116,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Restart Docker containers
 -   [ ] Run migrations if needed
 
-#### 8.3.4: Create Monitoring Dashboard
+#### 8.3.4: Monitoring Dashboard [PR]
 
 -   [ ] Set up CloudWatch dashboard
 -   [ ] Add key metrics (requests, errors, latency)
@@ -2142,14 +2186,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 9.1: OAuth Integration
 
-#### 9.1.1: Set Up Google OAuth
+#### 9.1.1: Google OAuth Provider Setup [PR]
 
 -   [ ] Create Google Cloud project
 -   [ ] Enable Google Sign-In API
 -   [ ] Get client ID and secret
 -   [ ] Add to .env
 
-#### 9.1.2: Implement Google OAuth Backend
+#### 9.1.2: Google OAuth Backend [PR]
 
 -   [ ] Install passport and passport-google-oauth20
 -   [ ] Configure passport strategy
@@ -2158,7 +2202,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Create or login user
 -   [ ] Return JWT
 
-#### 9.1.3: Add Google Sign-In to Frontend
+#### 9.1.3: Google Sign-In Frontend [PR]
 
 -   [ ] Add Google Sign-In button
 -   [ ] Redirect to OAuth URL
@@ -2166,7 +2210,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Store JWT
 -   [ ] Navigate to dashboard
 
-#### 9.1.4: Set Up Apple Sign-In
+#### 9.1.4: Apple Sign-In (backend + frontend) [PR]
 
 -   [ ] Configure Apple Developer account
 -   [ ] Create service ID
@@ -2186,12 +2230,12 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 9.2: Two-Factor Authentication
 
-#### 9.2.1: Install 2FA Dependencies
+#### 9.2.1: 2FA Dependencies + Schema [PR]
 
 -   [ ] Install speakeasy (TOTP)
 -   [ ] Install qrcode (QR generation)
 
-#### 9.2.2: Implement 2FA Backend
+#### 9.2.2: 2FA Backend (setup, verify, disable) [PR]
 
 -   [ ] Add twoFactorSecret field to User model
 -   [ ] Add twoFactorEnabled boolean
@@ -2199,13 +2243,13 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Create POST /api/auth/2fa/verify (verify code, enable 2FA)
 -   [ ] Create POST /api/auth/2fa/disable
 
-#### 9.2.3: Update Login Flow
+#### 9.2.3: 2FA-aware Login Flow [PR]
 
 -   [ ] After password validation, check if 2FA enabled
 -   [ ] If yes, require 2FA code
 -   [ ] Verify code before issuing JWT
 
-#### 9.2.4: Add 2FA to Frontend
+#### 9.2.4: 2FA Frontend (settings + login UI) [PR]
 
 -   [ ] Create 2FA setup page in settings
 -   [ ] Display QR code
@@ -2213,7 +2257,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Test setup flow
 -   [ ] Add 2FA code input on login
 
-#### 9.2.5: Generate Backup Codes
+#### 9.2.5: Backup Codes [PR]
 
 -   [ ] Generate 10 backup codes on 2FA setup
 -   [ ] Store hashed in database
@@ -2226,7 +2270,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 
 ### Sub-Phase 9.3: Advanced Features & Optimization
 
-#### 9.3.1: Implement Advanced Filtering
+#### 9.3.1: Advanced Filtering [PR]
 
 -   [ ] Add full-text search on expense descriptions
 -   [ ] Add multi-category filter
@@ -2234,7 +2278,7 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Add merchant search
 -   [ ] Add saved filter presets
 
-#### 9.3.2: Add Redis Caching
+#### 9.3.2: Redis Caching Middleware [PR]
 
 -   [ ] Install ioredis
 -   [ ] Create caching middleware
@@ -2242,14 +2286,14 @@ Split into vertical slices. Each `[PR]` marker = a mergeable PR.
 -   [ ] Cache category list
 -   [ ] Invalidate on create/update/delete
 
-#### 9.3.3: Optimize Database Queries
+#### 9.3.3: DB Query Optimization (indexes, projections) [PR]
 
 -   [ ] Add indexes on frequently queried fields
 -   [ ] Optimize dashboard aggregations
 -   [ ] Use SELECT only needed fields
 -   [ ] Batch queries where possible
 
-#### 9.3.4: Add Rate Limiting
+#### 9.3.4: Rate Limiting on Sensitive Endpoints [PR]
 
 -   [ ] Install express-rate-limit
 -   [ ] Add rate limiting to auth endpoints
@@ -2799,8 +2843,8 @@ Remember: **This is YOUR learning journey. Take your time, understand deeply, an
 
 ---
 
-**Plan Version**: 1.1  
-**Last Updated**: April 2026  
+**Plan Version**: 1.2  
+**Last Updated**: April 2026 (PR strategy applied across all phases)  
 **Estimated Total Time**: 8-9 months (5-7 hours/week)  
 **Maintainer**: You + AI Assistant (mentor/reviewer role)
 

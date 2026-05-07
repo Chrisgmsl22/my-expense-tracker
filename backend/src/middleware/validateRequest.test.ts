@@ -162,4 +162,114 @@ describe("validateRequest middleware", () => {
         expect(mockLogError).toHaveBeenCalledWith("Validate request error");
         expect(mockNext).toHaveBeenCalledWith(genericError);
     });
+
+    describe("Params branch", () => {
+        it("Should write parsed result to req.validatedParams and leave req.params untouched", () => {
+            // Raw params: contains an extra field that Zod would strip
+            const rawParams = {
+                id: "abc-123",
+                extraIgnoredField: "should-not-survive-validation",
+            };
+            // Parsed params: the cleaned-up version (no extra field)
+            const parsedParams = { id: "abc-123" };
+
+            mockRequest.params = rawParams;
+            mockParse.mockReturnValue(parsedParams);
+
+            const middlewareFunction = validateRequest(
+                mockZodSchema as unknown as z.ZodType,
+                ValidateReq.Params
+            );
+
+            middlewareFunction(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(mockParse).toHaveBeenCalledWith(rawParams);
+
+            // The validated copy is the cleaned-up version
+            expect(mockRequest.validatedParams).toEqual(parsedParams);
+            expect(mockRequest.validatedParams).not.toHaveProperty(
+                "extraIgnoredField"
+            );
+
+            // The original req.params still has the raw, untouched data
+            expect(mockRequest.params).toBe(rawParams);
+            expect(mockRequest.params).toHaveProperty(
+                "extraIgnoredField",
+                "should-not-survive-validation"
+            );
+
+            expect(mockNext).toHaveBeenCalledWith();
+        });
+    });
+
+    describe("Query branch", () => {
+        it("Should write parsed result to req.validatedQuery and leave req.query untouched", () => {
+            // Raw query: strings (URL params always arrive as strings) + extra field
+            const rawQuery = {
+                categoryId: "cat-1",
+                dateFrom: "2026-01-01",
+                garbageField: "should-be-stripped",
+            };
+            // Parsed query: dateFrom coerced to Date, extras stripped
+            const parsedQuery = {
+                categoryId: "cat-1",
+                dateFrom: new Date("2026-01-01"),
+            };
+
+            mockRequest.query = rawQuery;
+            mockParse.mockReturnValue(parsedQuery);
+
+            const middlewareFunction = validateRequest(
+                mockZodSchema as unknown as z.ZodType,
+                ValidateReq.Query
+            );
+
+            middlewareFunction(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(mockParse).toHaveBeenCalledWith(rawQuery);
+
+            // validatedQuery has the parsed/coerced types
+            expect(mockRequest.validatedQuery).toEqual(parsedQuery);
+            expect(
+                (mockRequest.validatedQuery as { dateFrom: Date }).dateFrom
+            ).toBeInstanceOf(Date);
+            expect(mockRequest.validatedQuery).not.toHaveProperty(
+                "garbageField"
+            );
+
+            // req.query still has the raw URL strings (Express 5: read-only, must NOT be reassigned)
+            expect(mockRequest.query).toBe(rawQuery);
+            expect(mockRequest.query).toHaveProperty("dateFrom", "2026-01-01");
+
+            expect(mockNext).toHaveBeenCalledWith();
+        });
+
+        it("Should accept empty query objects (all filters optional)", () => {
+            mockRequest.query = {};
+            mockParse.mockReturnValue({});
+
+            const middlewareFunction = validateRequest(
+                mockZodSchema as unknown as z.ZodType,
+                ValidateReq.Query
+            );
+
+            middlewareFunction(
+                mockRequest as Request,
+                mockResponse as Response,
+                mockNext
+            );
+
+            expect(mockParse).toHaveBeenCalledWith({});
+            expect(mockRequest.validatedQuery).toEqual({});
+            expect(mockNext).toHaveBeenCalledWith();
+        });
+    });
 });

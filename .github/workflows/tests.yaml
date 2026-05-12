@@ -1,0 +1,38 @@
+name: Tests
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        env:
+            POSTGRES_USER: ci
+            POSTGRES_PASSWORD: ci
+            POSTGRES_DB: ci
+            DB_PORT: 5432
+            JWT_SECRET: ci-test-secret
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - name: Checkout repository code # checkout
+              uses: actions/checkout@v4
+            - name: Node setup
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "npm"
+                  cache-dependency-path: backend/package-lock.json
+            - name: Install
+              run: npm ci
+            - name: Generate prisma client (since CI doesn't have it)
+              run: npx prisma generate
+            - name: Linter
+              run: npm run lint
+            - name: Test
+              run: npm run test

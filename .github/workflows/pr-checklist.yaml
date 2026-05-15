@@ -1,0 +1,53 @@
+name: PR Checklist
+
+on:
+    pull_request:
+        types: [opened, edited, synchronize, reopened]
+
+jobs:
+    checklist:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Verify checklist boxes are checked
+              env:
+                  BODY: ${{ github.event.pull_request.body }}
+              run: |
+                  if [ -z "$BODY" ]; then
+                      echo "::error::PR description is empty. Use the PR template."
+                      exit 1
+                  fi
+
+                  # Escape hatch: if the user checked "The work for this PR is not a slice",
+                  # skip checks inside the "## Slice lifecycle" section.
+                  if printf '%s\n' "$BODY" | grep -qE '^[[:space:]]*-[[:space:]]*\[[xX]\][[:space:]]+The work for this PR is not a slice'; then
+                      NON_SLICE=1
+                      echo "Non-slice PR detected — slice lifecycle section will be skipped."
+                  else
+                      NON_SLICE=0
+                  fi
+
+                  if [ "$NON_SLICE" -eq 1 ]; then
+                      # Strip everything between "## Slice lifecycle" and the next "## " heading
+                      CHECK_BODY=$(printf '%s\n' "$BODY" | awk '
+                          /^## Slice lifecycle/ {in_slice=1; next}
+                          in_slice && /^## / {in_slice=0}
+                          !in_slice {print}
+                      ')
+                  else
+                      CHECK_BODY="$BODY"
+                  fi
+
+                  # The escape-hatch line is a meta-control, not a required item — exclude it from the count.
+                  COUNT_BODY=$(printf '%s\n' "$CHECK_BODY" | grep -vE '^[[:space:]]*-[[:space:]]*\[[[:space:]xX]\][[:space:]]+The work for this PR is not a slice' || true)
+
+                  UNCHECKED=$(printf '%s\n' "$COUNT_BODY" | grep -cE '^[[:space:]]*-[[:space:]]*\[[[:space:]]\]' || true)
+
+                  if [ "$UNCHECKED" -gt 0 ]; then
+                      echo "::error::PR has $UNCHECKED unchecked required item(s). Complete the checklist (or check 'The work for this PR is not a slice' if applicable) before merging."
+                      echo ""
+                      echo "Unchecked items:"
+                      printf '%s\n' "$COUNT_BODY" | grep -nE '^[[:space:]]*-[[:space:]]*\[[[:space:]]\]' || true
+                      exit 1
+                  fi
+
+                  echo "All required checklist items are checked."

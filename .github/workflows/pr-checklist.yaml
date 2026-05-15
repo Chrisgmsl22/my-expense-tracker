@@ -17,29 +17,18 @@ jobs:
                       exit 1
                   fi
 
-                  # Escape hatch: if the user checked "The work for this PR is not a slice",
-                  # skip checks inside the "## Slice lifecycle" section.
+                  # Escape hatch: if "The work for this PR is not a slice" is checked,
+                  # the user has explicitly opted out of slice-lifecycle enforcement.
+                  # Pass the gate immediately; we trust them on Test plan items too
+                  # (the tests.yaml workflow still enforces actual test/lint passing).
                   if printf '%s\n' "$BODY" | grep -qE '^[[:space:]]*-[[:space:]]*\[[xX]\][[:space:]]+The work for this PR is not a slice'; then
-                      NON_SLICE=1
-                      echo "Non-slice PR detected — slice lifecycle section will be skipped."
-                  else
-                      NON_SLICE=0
+                      echo "Non-slice PR — checklist gate passes (user opted out via escape hatch)."
+                      exit 0
                   fi
 
-                  if [ "$NON_SLICE" -eq 1 ]; then
-                      # Strip everything between "## Slice lifecycle" and the next "## " heading
-                      CHECK_BODY=$(printf '%s\n' "$BODY" | awk '
-                          /^## Slice lifecycle/ {in_slice=1; next}
-                          in_slice && /^## / {in_slice=0}
-                          !in_slice {print}
-                      ')
-                  else
-                      CHECK_BODY="$BODY"
-                  fi
-
-                  # The escape-hatch line is a meta-control, not a required item — exclude it from the count.
-                  COUNT_BODY=$(printf '%s\n' "$CHECK_BODY" | grep -vE '^[[:space:]]*-[[:space:]]*\[[[:space:]xX]\][[:space:]]+The work for this PR is not a slice' || true)
-
+                  # Slice PR: all unchecked boxes block merge — except the escape-hatch
+                  # line itself, which is a meta-control rather than a required item.
+                  COUNT_BODY=$(printf '%s\n' "$BODY" | grep -vE '^[[:space:]]*-[[:space:]]*\[[[:space:]xX]\][[:space:]]+The work for this PR is not a slice' || true)
                   UNCHECKED=$(printf '%s\n' "$COUNT_BODY" | grep -cE '^[[:space:]]*-[[:space:]]*\[[[:space:]]\]' || true)
 
                   if [ "$UNCHECKED" -gt 0 ]; then

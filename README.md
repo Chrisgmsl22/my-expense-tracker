@@ -51,5 +51,11 @@ make dev
 
 ## Documentation
 
--   [Action Plan](./ACTION_PLAN.MD) - Development roadmap and progress
--   [Requirements](./REQUIREMENTS.md) - Detailed feature specifications
+-   [Roadmap](./docs/roadmap/README.md) — Phase-by-phase development plan and current status
+-   [Architecture Decision Records](./docs/decisions/) — Why key design choices were made
+-   [PR strategy](./docs/conventions/pr-strategy.md) — How work is sliced into shippable PRs
+-   [Slice planning](./docs/conventions/slice-planning.md) — How to plan a slice before coding it
+-   [Coding conventions](./docs/conventions/coding-conventions.md) — Backend code style, architecture, testing patterns
+-   [Planned API surface](./docs/reference/api-endpoints.md) — Endpoint plan across phases
+-   [Requirements](./REQUIREMENTS.md) — Detailed feature specifications
+-   [Claude assistant guide](./claude.md) — Working style, learning philosophy, AI rules

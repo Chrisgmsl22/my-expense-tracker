@@ -1,0 +1,42 @@
+name: PR Checklist
+
+on:
+    pull_request:
+        types: [opened, edited, synchronize, reopened]
+
+jobs:
+    checklist:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Verify checklist boxes are checked
+              env:
+                  BODY: ${{ github.event.pull_request.body }}
+              run: |
+                  if [ -z "$BODY" ]; then
+                      echo "::error::PR description is empty. Use the PR template."
+                      exit 1
+                  fi
+
+                  # Escape hatch: if "The work for this PR is not a slice" is checked,
+                  # the user has explicitly opted out of slice-lifecycle enforcement.
+                  # Pass the gate immediately; we trust them on Test plan items too
+                  # (the tests.yaml workflow still enforces actual test/lint passing).
+                  if printf '%s\n' "$BODY" | grep -qE '^[[:space:]]*-[[:space:]]*\[[xX]\][[:space:]]+The work for this PR is not a slice'; then
+                      echo "Non-slice PR — checklist gate passes (user opted out via escape hatch)."
+                      exit 0
+                  fi
+
+                  # Slice PR: all unchecked boxes block merge — except the escape-hatch
+                  # line itself, which is a meta-control rather than a required item.
+                  COUNT_BODY=$(printf '%s\n' "$BODY" | grep -vE '^[[:space:]]*-[[:space:]]*\[[[:space:]xX]\][[:space:]]+The work for this PR is not a slice' || true)
+                  UNCHECKED=$(printf '%s\n' "$COUNT_BODY" | grep -cE '^[[:space:]]*-[[:space:]]*\[[[:space:]]\]' || true)
+
+                  if [ "$UNCHECKED" -gt 0 ]; then
+                      echo "::error::PR has $UNCHECKED unchecked required item(s). Complete the checklist (or check 'The work for this PR is not a slice' if applicable) before merging."
+                      echo ""
+                      echo "Unchecked items:"
+                      printf '%s\n' "$COUNT_BODY" | grep -nE '^[[:space:]]*-[[:space:]]*\[[[:space:]]\]' || true
+                      exit 1
+                  fi
+
+                  echo "All required checklist items are checked."

@@ -8,7 +8,9 @@ own file with checklists and PR slices.
 **Phase 2 — Core Expense Tracking** ([phase-2-core-expense.md](./phase-2-core-expense.md))
 
 - ✅ Sub-Phase 2.1 — Expense CRUD (controller, routes, validation, unit tests)
-- 🟡 **Sub-Phase 2.2 — Category Management** ← *next slice up: 2.2.1 Category Service*
+- 🟡 **Sub-Phase 2.2 — Category Management**
+  - ✅ 2.2.0 Schema + Seed Refactor
+  - ← *next slice up: 2.2.1 Category Service*
 - ⚪ Sub-Phase 2.3 — Card Management
 - ⚪ Sub-Phase 2.4 — Dashboard Aggregations
 - ⚪ Sub-Phase 2.5 — Shared Expenses & Settlement

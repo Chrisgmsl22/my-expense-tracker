@@ -71,53 +71,26 @@ the full rules.
 
 ## Sub-Phase 2.2: Category Management
 
+### 2.2.0: Schema + Seed Refactor ✅ [PR]
+
+- [x] Add `slug String? @unique` to Category model in `backend/prisma/schema.prisma`
+- [x] Generate migration: `npx prisma migrate dev --name add_category_slug`
+- [x] Update `SeedSystemCategories` interface in `backend/src/types/seedTypes.ts` (add `slug: string`)
+- [x] Add slug values to all 13 entries in `backend/prisma/seed.ts`
+- [x] Refactor seed loop to use `prisma.category.upsert()`
+- [x] Run `npx prisma migrate reset` and verify all 13 categories seeded
+- [x] Run `npx prisma db seed` again — verify idempotency (no errors)
+- [x] `make test` and `make lint` green
+
 ### 2.2.1: Category Service [PR]
 
-#### Plan
-
-**Scope (in)**
-
-- `backend/src/services/category.service.ts` — class with CRUD methods
-- `backend/src/types/category.ts` — TypeScript interfaces
-- `backend/src/services/category/category.service.test.ts` — unit tests (mocked Prisma)
-- Seed Unassigned system category (migration or seed update)
-
-**Scope (out)**
-
-- Controller, routes, validation schemas → 2.2.3 (next slice)
-- Subcategory CRUD → 2.2.2 (separate slice)
-- System category customization (e.g., toggling `isRelevant`) — deferred per [ADR-0002](../decisions/0002-defer-system-category-customization.md)
-
-**Design decisions**
-
-- Cascade delete reassigns orphaned expenses to the "Unassigned" sentinel category — see [ADR-0001](../decisions/0001-unassigned-sentinel-category.md). Implement inside a Prisma transaction.
-- System categories (`isSystemCategory = true`) are immutable to users. Service throws `ValidationError` on any update/delete attempt.
-- The "Unassigned" category itself is also undeletable — guard explicitly.
-- `getCategories(userId)` returns system categories ∪ user's custom categories.
-
-**Acceptance criteria**
-
-- All 5 service methods implemented with TypeScript types
-- Unit tests cover: happy path for each method, the cascade-to-Unassigned flow, system category protection, Unassigned-category protection
-- `make test` green, `make lint` green
-- No controller/routes touched (proves the slice is service-only)
-
-**Open questions**
-
-- Does the current schema have `Expense.categoryId` as `NOT NULL`? — verify before coding (the cascade approach assumes it does).
-- Does the seed already include an "Unassigned" category? — if not, decide whether to update the seed in this PR or in a sibling migration PR.
-
-#### Tasks
-
-- [ ] Verify schema (`Expense.categoryId` nullability, existing seed)
-- [ ] Add Unassigned to seed if missing
-- [ ] Create services/category.service.ts
-- [ ] Implement getCategories (system + user's custom)
-- [ ] Implement createCategory (custom)
-- [ ] Implement updateCategory (block system categories)
-- [ ] Implement deleteCategory (cascade to Unassigned per ADR-0001, transaction)
-- [ ] Add TypeScript interfaces
-- [ ] Unit tests covering all service methods + guards
+- [ ] Create `backend/src/services/category/category.service.ts`
+- [ ] Create `backend/src/types/category.ts` (TypeScript interfaces)
+- [ ] Implement `getCategories` (system + user's custom)
+- [ ] Implement `createCategory` (custom only)
+- [ ] Implement `updateCategory` — throw `ValidationError` on system categories
+- [ ] Implement `deleteCategory` — cascade to Unassigned (lookup by `slug: "unassigned"` per [ADR-0001](../decisions/0001-unassigned-sentinel-category.md)) inside a Prisma transaction; reject deletion of the Unassigned category itself
+- [ ] Unit tests covering all service methods + guards (system protection, Unassigned protection, cascade behavior)
 
 ### 2.2.2: Subcategory Service [PR]
 

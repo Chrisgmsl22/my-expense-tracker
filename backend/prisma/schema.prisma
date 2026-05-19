@@ -45,6 +45,7 @@ model Category {
   id String @id @default(uuid())
   userId String? // Scalar field ==> FK
   user User? @relation(fields: [userId], references: [id]) // Relation field (DOES NOT EXIST IN DB)
+  slug String? @unique  
   
   name String
   isRelevant Boolean @default(true)

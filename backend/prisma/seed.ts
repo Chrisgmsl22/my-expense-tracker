@@ -20,6 +20,7 @@ const prisma = new PrismaClient({ adapter });
 const systemCategories: SeedSystemCategories[] = [
     {
         name: "Housing",
+        slug: "housing",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: [
@@ -32,18 +33,21 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Groceries",
+        slug: "groceries",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: ["Groceries", "Restaurants/other"],
     },
     {
         name: "Charity",
+        slug: "charity",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: ["Taxes", "Donations"],
     },
     {
         name: "Transport",
+        slug: "transport",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: [
@@ -58,6 +62,7 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Insurance",
+        slug: "insurance",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: [
@@ -72,12 +77,14 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Savings",
+        slug: "savings",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: ["Emergency fund", "Open savings", "Future purchases"],
     },
     {
         name: "Services",
+        slug: "services",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: [
@@ -91,6 +98,7 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Health",
+        slug: "health",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: [
@@ -104,6 +112,7 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Combined Expenses",
+        slug: "combined-expenses",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: [
@@ -114,6 +123,7 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Personal",
+        slug: "personal",
         isSystemCategory: true,
         isRelevant: false, // Discretionary spending
         subcategories: [
@@ -129,6 +139,7 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Debt",
+        slug: "debt",
         isSystemCategory: true,
         isRelevant: true,
         subcategories: [
@@ -140,6 +151,7 @@ const systemCategories: SeedSystemCategories[] = [
     },
     {
         name: "Disposable Income",
+        slug: "disposable-income",
         isSystemCategory: true,
         isRelevant: false, // Discretionary spending
         subcategories: [
@@ -151,6 +163,13 @@ const systemCategories: SeedSystemCategories[] = [
             "Ecommerce expenses",
         ],
     },
+    {
+        name: "Unassigned",
+        slug: "unassigned",
+        isSystemCategory: true,
+        isRelevant: false,
+        subcategories: [],
+    },
 ];
 
 const main = async () => {
@@ -159,11 +178,20 @@ const main = async () => {
 
     for (const category of systemCategories) {
         // Create category with nested categories
-        await prisma.category.create({
-            data: {
+        await prisma.category.upsert({
+            where: {
+                slug: category.slug,
+            },
+            update: {
                 name: category.name,
                 isSystemCategory: category.isSystemCategory,
                 isRelevant: category.isRelevant,
+            },
+            create: {
+                name: category.name,
+                isSystemCategory: category.isSystemCategory,
+                isRelevant: category.isRelevant,
+                slug: category.slug,
                 subcategories: {
                     create: category.subcategories.map((name) => {
                         return {

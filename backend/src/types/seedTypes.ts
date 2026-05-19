@@ -3,4 +3,5 @@ export type SeedSystemCategories = {
     isSystemCategory: boolean;
     isRelevant: boolean;
     subcategories: string[];
+    slug: string;
 };
